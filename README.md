@@ -22,39 +22,122 @@ This project enables users to query enterprise business metrics using natural la
 - LangChain
 - Next.js
 
-### Status
+## Project Architecture
 
-Project 1 – Implementation Phase 1 (Week 1)
+```text
+                        User
+                          │
+                          ▼
+                Frontend (Next.js)
+                          │
+                          ▼
+           Backend API (Python + LangChain)
+                          │
+                          ▼
+           Semantic Layer (Cube.dev)
+                          │
+                          ▼
+               dbt Transformation Models
+                          │
+                          ▼
+            Snowflake Data Warehouse
+                          ▲
+                          │
+              Raw Business Data (CSV)
+```
+## Project Structure
 
-## Internship Progress
+```text
+MetricMind/
+│
+├── backend/               # Backend APIs and business logic
+├── frontend/              # Next.js chat interface
+├── dashboard/             # Analytics dashboards
+├── data/
+│   ├── raw/               # Raw business datasets
+│   └── transformed/       # Cleaned and transformed datasets
+│
+├── dbt/                   # dbt transformation models
+├── semantic/              # Cube.dev semantic layer
+├── docs/                  # Project documentation
+├── images/                # Images and diagrams
+├── sql/                   # SQL scripts
+├── src/                   # Source code
+├── tests/                 # Unit and integration tests
+│
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
+## Technology Stack
 
-### Week 1
+| Layer | Technology |
+|--------|------------|
+| Programming Language | Python |
+| Database | Snowflake |
+| Data Transformation | dbt |
+| Semantic Layer | Cube.dev |
+| AI Framework | LangChain |
+| Frontend | Next.js |
+| Version Control | Git |
+| Repository | GitHub |
 
-#### Day 1 (15 July 2026)
+## Implementation Roadmap
 
-- Created the MetricMind project repository.
-- Designed the project folder structure.
-- Added README.md, .gitignore, and requirements.txt.
-- Initialized the local Git repository.
-- Learned Git fundamentals (Repository, Staging, Commit, Branches, Remote Repository).
-- Created the first professional Git commit.
-- Connected the local repository to GitHub.
-- Published the project to GitHub successfully.
+### Phase 1
+- Project Architecture
+- Warehouse Setup
+- Data Modeling
+- Chat Interface Foundation
 
-**Current Status:** ✅ Week 1 - Day 1 Completed
+### Phase 2
+- Semantic Layer Development
+- AI Agent Integration
+- API Development
 
-### Day 2 (16 July 2026)
+### Phase 3
+- Dynamic Visualizations
+- Multi-step Reasoning
+- Business Metrics
 
-- Added the project architecture folders:
-  - backend
-  - frontend
-  - dbt
-  - semantic
-- Organized the data directory into:
-  - raw
-  - processed
-- Added `.gitkeep` files to ensure Git tracks empty project folders.
-- Updated the project structure according to the Project Execution Handbook.
-- Prepared the project for Implementation Phase 1 (Warehouse & Modeling and Chat Scaffolding).
+### Phase 4
+- Testing
+- Optimization
+- Final Deployment
 
-**Current Status:** ✅ Week 1 - Day 2 Completed
+## Core Features
+
+- Enterprise Business Analytics
+- Natural Language Querying
+- Semantic Metric Definitions
+- AI-powered Business Insights
+- Governed Data Access
+- Interactive Chat Interface
+- Dynamic Data Visualizations
+
+## Current Progress
+
+- Project repository initialized
+- Enterprise project architecture established
+- Development environment configured
+- Technology stack finalized
+- Phase 1 implementation started
+
+## Upcoming Modules
+
+- Snowflake Warehouse
+- dbt Models
+- Cube.dev Semantic Layer
+- LangChain AI Agent
+- Next.js Chat UI
+- REST API
+- Interactive Dashboard
+
+## Future Enhancements
+
+- Authentication
+- Role-based Access
+- Dashboard Export
+- KPI Monitoring
+- Query History
+- AI Suggestions
