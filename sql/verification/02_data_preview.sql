@@ -1,0 +1,5 @@
+-- Preview first 10 records
+
+SELECT *
+FROM GLOBAL_SUPERSTORE
+LIMIT 10;
