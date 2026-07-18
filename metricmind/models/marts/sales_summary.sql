@@ -1,0 +1,7 @@
+SELECT
+    CATEGORY,
+    SUM(SALES) AS TOTAL_SALES,
+    SUM(PROFIT) AS TOTAL_PROFIT,
+    COUNT(*) AS TOTAL_ORDERS
+FROM {{ ref('stg_global_superstore') }}
+GROUP BY CATEGORY

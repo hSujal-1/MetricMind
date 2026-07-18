@@ -1,0 +1,5 @@
+-- Calculate total business profit
+
+SELECT
+    ROUND(SUM(PROFIT), 2) AS TOTAL_PROFIT
+FROM GLOBAL_SUPERSTORE;

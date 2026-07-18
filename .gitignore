@@ -9,3 +9,11 @@ venv/
 
 .DS_Store
 Thumbs.db
+
+# dbt generated files
+metricmind/logs/
+metricmind/target/
+metricmind/dbt_packages/
+
+# Root logs
+logs/
