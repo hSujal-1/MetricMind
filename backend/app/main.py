@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.config import APP_NAME, APP_VERSION
+from app.routers.metrics import router as metrics_router
 
 app = FastAPI(
     title=APP_NAME,
@@ -20,3 +21,6 @@ def health():
     return {
         "status": "healthy"
     }
+
+
+app.include_router(metrics_router)
