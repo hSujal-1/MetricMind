@@ -4,8 +4,6 @@
 
 Building an AI-ready analytics platform using Snowflake, dbt, FastAPI and a custom semantic layer.
 
-### Description
-
 ## Description
 
 MetricMind is an enterprise Semantic Business Intelligence (BI) Engine designed using modern analytics engineering practices.
@@ -27,46 +25,42 @@ Currently, MetricMind includes a modular backend, metadata discovery APIs, and a
 
 ## Project Architecture
 
-```text
-                                  ┌─────────────────────────────┐
-                                  │         Business User       │
-                                  └──────────────┬──────────────┘
-                                                 │
-                                                 ▼
-                              Natural Language / Dashboard Interaction
-                                                 │
-                                                 ▼
-                              ┌──────────────────────────────────┐
-                              │        Next.js Frontend          │
-                              │  Dashboards • Chat • Analytics   │
-                              └──────────────┬───────────────────┘
-                                             │ REST API
-                                             ▼
-                         ┌──────────────────────────────────────────┐
-                         │            FastAPI Backend               │
-                         │ Authentication • API • Business Logic    │
-                         └──────────────┬───────────────────────────┘
-                                        │
-                ┌───────────────────────┼─────────────────────────┐
-                │                       │                         │
-                ▼                       ▼                         ▼
-      Semantic Metrics          AI Query Engine          Metadata Services
-    Business Metrics & KPIs      LangChain + LLM          Tables • Columns
-                │                       │                         │
-                └───────────────────────┼─────────────────────────┘
-                                        ▼
-                           Semantic Query Generation
-                                        │
-                                        ▼
-                         ┌──────────────────────────────────────────┐
-                         │        Snowflake Data Warehouse          │
-                         └──────────────────────────────────────────┘
-                                        ▲
-                                        │
-                          dbt Models & Business Transformations
-                                        ▲
-                                        │
-                         Raw Business Data (CSV / Excel / APIs)
+```mermaid
+flowchart TD
+    A[Business User]
+    B[Next.js Frontend<br/>Dashboards • Chat • Analytics]
+    C[FastAPI Backend<br/>Authentication • API • Business Logic]
+    D[Semantic Metrics<br/>Business Metrics & KPIs]
+    E[AI Query Engine<br/>LangChain + LLM]
+    F[Metadata Services<br/>Tables • Columns]
+    G[Semantic Query Generation]
+    H[(Snowflake Data Warehouse)]
+    I[dbt Models & Business Transformations]
+    J[Raw Business Data<br/>CSV / Excel / APIs]
+ 
+    A -->|Natural Language / Dashboard Interaction| B
+    B -->|REST API| C
+    C --> D
+    C --> E
+    C --> F
+    D --> G
+    E --> G
+    F --> G
+    G --> H
+    J --> I
+    I --> H
+ 
+    classDef user fill:#f5f5f5,stroke:#333,stroke-width:1px;
+    classDef frontend fill:#dbe9ff,stroke:#333,stroke-width:1px;
+    classDef backend fill:#e2d6f7,stroke:#333,stroke-width:1px;
+    classDef core fill:#fff2cc,stroke:#333,stroke-width:1px;
+    classDef data fill:#d9ead3,stroke:#333,stroke-width:1px;
+ 
+    class A user;
+    class B frontend;
+    class C backend;
+    class D,E,F,G core;
+    class H,I,J data;
 ```
 ## Project Structure
 
