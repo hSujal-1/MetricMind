@@ -1,49 +1,72 @@
-# MetricMind
+# 🚀 MetricMind
 
-## Enterprise Semantic BI Engine using AI, Semantic Layer and Modern Data Analytics
+### Enterprise Semantic Business Intelligence Engine
 
-Project 1 for the Axlero AI Engineering Internship.
+Building an AI-ready analytics platform using Snowflake, dbt, FastAPI and a custom semantic layer.
 
 ### Description
 
-MetricMind is an enterprise analytics platform that allows business users to ask questions in natural language while ensuring consistent business metrics through a governed semantic layer.
+## Description
 
-This project enables users to query enterprise business metrics using natural language by combining Snowflake, dbt, Cube.dev, LangChain, and Next.js.
+MetricMind is an enterprise Semantic Business Intelligence (BI) Engine designed using modern analytics engineering practices.
 
-### Technologies
+The project combines Snowflake, dbt, FastAPI, and a custom semantic layer to build an AI-ready analytics platform capable of serving governed business metrics through REST APIs.
 
-- Python
-- SQL
-- Git
-- GitHub
-- Snowflake
-- dbt
-- Cube.dev
-- LangChain
-- Next.js
+Currently, MetricMind includes a modular backend, metadata discovery APIs, and a scalable architecture that will later support natural language querying, semantic metrics, and an interactive analytics dashboard.
+
+## 🛠 Technologies
+
+- **Programming Language:** Python 3.13
+- **Cloud Data Warehouse:** Snowflake
+- **Data Transformation:** dbt
+- **Backend Framework:** FastAPI
+- **Semantic Layer:** Custom Python Semantic Layer
+- **AI Framework:** LangChain *(planned integration)*
+- **Frontend:** Next.js *(planned)*
+- **Version Control:** Git & GitHub
 
 ## Project Architecture
 
 ```text
-                        User
-                          │
-                          ▼
-                Frontend (Next.js)
-                          │
-                          ▼
-           Backend API (Python + LangChain)
-                          │
-                          ▼
-           Semantic Layer (Cube.dev)
-                          │
-                          ▼
-               dbt Transformation Models
-                          │
-                          ▼
-            Snowflake Data Warehouse
-                          ▲
-                          │
-              Raw Business Data (CSV)
+                                  ┌─────────────────────────────┐
+                                  │         Business User       │
+                                  └──────────────┬──────────────┘
+                                                 │
+                                                 ▼
+                              Natural Language / Dashboard Interaction
+                                                 │
+                                                 ▼
+                              ┌──────────────────────────────────┐
+                              │        Next.js Frontend          │
+                              │  Dashboards • Chat • Analytics   │
+                              └──────────────┬───────────────────┘
+                                             │ REST API
+                                             ▼
+                         ┌──────────────────────────────────────────┐
+                         │            FastAPI Backend               │
+                         │ Authentication • API • Business Logic    │
+                         └──────────────┬───────────────────────────┘
+                                        │
+                ┌───────────────────────┼─────────────────────────┐
+                │                       │                         │
+                ▼                       ▼                         ▼
+      Semantic Metrics          AI Query Engine          Metadata Services
+    Business Metrics & KPIs      LangChain + LLM          Tables • Columns
+                │                       │                         │
+                └───────────────────────┼─────────────────────────┘
+                                        ▼
+                           Semantic Query Generation
+                                        │
+                                        ▼
+                         ┌──────────────────────────────────────────┐
+                         │        Snowflake Data Warehouse          │
+                         └──────────────────────────────────────────┘
+                                        ▲
+                                        │
+                          dbt Models & Business Transformations
+                                        ▲
+                                        │
+                         Raw Business Data (CSV / Excel / APIs)
 ```
 ## Project Structure
 
@@ -71,17 +94,29 @@ MetricMind/
 ```
 ## Technology Stack
 
-| Layer | Technology |
-|--------|------------|
+| Layer                | Technology |
+|----------------------|------------|
 | Programming Language | Python |
-| Database | Snowflake |
-| Data Transformation | dbt |
-| Semantic Layer | Cube.dev |
-| AI Framework | LangChain |
-| Frontend | Next.js |
-| Version Control | Git |
-| Repository | GitHub |
+| Database             | Snowflake |
+| Data Transformation  | dbt |
+| Semantic Layer       | Custom Python Semantic Layer |
+| AI Framework         | LangChain |
+| Frontend             | Next.js |
+| Version Control      | Git |
+| Repository           | GitHub |
+| Backend Framework    | FastAPI |
 
+## 📡 REST API Endpoints
+
+MetricMind exposes REST APIs for metadata discovery and backend services.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Returns the welcome message of the MetricMind API. |
+| GET | `/health` | Checks whether the FastAPI service is running. |
+| GET | `/db-health` | Verifies the connection to the Snowflake data warehouse. |
+| GET | `/tables` | Returns all available tables from the connected Snowflake database. |
+| GET | `/tables/{table_name}/columns` | Returns the schema (columns and data types) of the specified table. |
 
 ## Core Features
 
