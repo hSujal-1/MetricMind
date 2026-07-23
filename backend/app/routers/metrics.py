@@ -14,6 +14,7 @@ from app.services.metrics_service import (
 
 from app.services.sql_generator import generate_sql
 from app.services.nlp_service import detect_metric
+from app.services.filter_service import detect_filters
 
 router = APIRouter(
     prefix="/api",
@@ -118,6 +119,7 @@ def ask_question(payload: dict = Body(...)):
 
     question = payload.get("question", "")
 
+    # Detect metric
     metric_name, metric = detect_metric(question)
 
     if metric is None:
@@ -126,8 +128,13 @@ def ask_question(payload: dict = Body(...)):
             "message": "No matching metric found."
         }
 
-    sql = generate_sql(metric_name)
+    # Detect filters
+    filters = detect_filters(question)
 
+    # Generate SQL
+    sql = generate_sql(metric_name, filters)
+
+    # Execute SQL
     result = execute_query(sql)
 
     if result["status"] == "Failed":
@@ -136,6 +143,7 @@ def ask_question(payload: dict = Body(...)):
     return {
         "question": question,
         "metric": metric["display_name"],
+        "filters": filters,
         "sql": sql,
         "value": result["result"]
     }
