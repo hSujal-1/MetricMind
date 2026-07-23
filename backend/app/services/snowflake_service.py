@@ -149,3 +149,38 @@ def execute_query(sql: str):
 
         if conn:
             conn.close()
+
+def get_distinct_values(table_name: str, column_name: str):
+    """
+    Returns distinct values from a table column.
+    """
+
+    conn = None
+    cur = None
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        query = f"""
+        SELECT DISTINCT {column_name}
+        FROM {table_name}
+        WHERE {column_name} IS NOT NULL
+        ORDER BY {column_name};
+        """
+
+        cur.execute(query)
+
+        rows = cur.fetchall()
+
+        return [row[0] for row in rows]
+
+    except Exception as e:
+        return []
+
+    finally:
+        if cur:
+            cur.close()
+
+        if conn:
+            conn.close()
