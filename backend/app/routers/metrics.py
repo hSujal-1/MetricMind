@@ -4,9 +4,15 @@ from app.services.snowflake_service import (
     check_connection,
     get_tables,
     get_table_columns,
+    execute_query
 )
 
-from app.services.metrics_service import get_all_metrics
+from app.services.metrics_service import (
+    get_all_metrics,
+    get_metric
+)
+
+from app.services.sql_generator import generate_sql
 
 router = APIRouter(
     prefix="/api",
@@ -48,4 +54,75 @@ def list_metrics():
     return {
         "count": len(metrics),
         "metrics": metrics
+    }
+
+
+@router.get("/sql/{metric_name}")
+def generate_metric_sql(metric_name: str):
+    """
+    Generates SQL for a semantic metric.
+    """
+
+    metric = get_metric(metric_name)
+
+    if metric is None:
+        return {
+            "status": "Failed",
+            "message": "Metric not found."
+        }
+
+    sql = generate_sql(metric_name)
+
+    return {
+        "metric": metric_name,
+        "sql": sql
+    }
+@router.get("/sql/{metric_name}")
+def generate_metric_sql(metric_name: str):
+    """
+    Generates SQL for a semantic metric.
+    """
+
+    metric = get_metric(metric_name)
+
+    if metric is None:
+        return {
+            "status": "Failed",
+            "message": "Metric not found."
+        }
+
+    sql = generate_sql(metric_name)
+
+    return {
+        "metric": metric_name,
+        "sql": sql
+    }
+
+
+@router.get("/query/{metric_name}")
+def execute_metric(metric_name: str):
+    """
+    Generates SQL from a semantic metric
+    and executes it in Snowflake.
+    """
+
+    metric = get_metric(metric_name)
+
+    if metric is None:
+        return {
+            "status": "Failed",
+            "message": "Metric not found."
+        }
+
+    sql = generate_sql(metric_name)
+
+    result = execute_query(sql)
+
+    if result["status"] == "Failed":
+        return result
+
+    return {
+        "metric": metric_name,
+        "sql": sql,
+        "value": result["result"]
     }

@@ -115,3 +115,37 @@ def get_table_columns(table_name):
 
             if conn:
                 conn.close()
+
+def execute_query(sql: str):
+    """
+    Executes any SQL query and returns the first result.
+    """
+
+    conn = None
+    cur = None
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute(sql)
+
+        result = cur.fetchone()
+
+        return {
+            "status": "Success",
+            "result": result[0] if result else None
+        }
+
+    except Exception as e:
+        return {
+            "status": "Failed",
+            "error": str(e)
+        }
+
+    finally:
+        if cur:
+            cur.close()
+
+        if conn:
+            conn.close()
