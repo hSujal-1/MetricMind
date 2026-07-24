@@ -29,3 +29,53 @@ FROM {metric['table']}
     sql += ";"
 
     return sql.strip()
+
+
+def generate_sql_from_plan(plan: dict):
+    """
+    Generate SQL from a semantic query plan.
+    Supports one or more metrics.
+    """
+
+    metrics = plan.get("metrics", [])
+    filters = plan.get("filters", {})
+
+    if not metrics:
+        return None
+
+    select_parts = []
+    table_name = None
+
+    for metric_name in metrics:
+
+        metric = get_metric(metric_name)
+
+        if metric is None:
+            return None
+
+        table_name = metric["table"]
+
+        select_parts.append(
+            f"{metric['aggregation']}({metric['column']}) AS {metric_name.upper()}"
+        )
+
+    sql = f"""
+SELECT
+{',\n'.join(select_parts)}
+FROM {table_name}
+"""
+
+    if filters:
+
+        conditions = []
+
+        for column, value in filters.items():
+            conditions.append(
+                f"{column} = '{value}'"
+            )
+
+        sql += "WHERE " + " AND ".join(conditions)
+
+    sql += ";"
+
+    return sql.strip()

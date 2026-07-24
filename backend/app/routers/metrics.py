@@ -12,13 +12,17 @@ from app.services.metrics_service import (
     get_metric
 )
 
-from app.services.sql_generator import generate_sql
+from app.services.sql_generator import (
+    generate_sql,
+    generate_sql_from_plan
+)
 from app.services.nlp_service import (
     detect_metric,
     detect_metrics
 )
 from app.services.filter_service import detect_filters
 from app.services.query_planner import build_query_plan
+from app.services.execution_engine import execute_query_plan
 
 router = APIRouter(
     prefix="/api",
@@ -123,14 +127,19 @@ def ask_question(payload: dict = Body(...)):
 
     question = payload.get("question", "")
 
-    # Detect metric
-    metric_name, metric = detect_metric(question)
+    # Build semantic query plan
+    plan = build_query_plan(question)
 
-    if metric is None:
-        return {
-            "status": "Failed",
-            "message": "No matching metric found."
-        }
+    # Execute the plan
+    result = execute_query_plan(plan)
+
+    if result.get("status") == "Failed":
+        return result
+
+    return {
+        "question": question,
+        **result
+    }
 
     # Detect filters
     filters = detect_filters(question)
