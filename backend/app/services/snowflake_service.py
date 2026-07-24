@@ -118,7 +118,8 @@ def get_table_columns(table_name):
 
 def execute_query(sql: str):
     """
-    Executes any SQL query and returns the first result.
+    Executes any SQL query and returns the first row.
+    Supports both single-metric and multi-metric queries.
     """
 
     conn = None
@@ -134,7 +135,7 @@ def execute_query(sql: str):
 
         return {
             "status": "Success",
-            "result": result[0] if result else None
+            "result": result if result else None
         }
 
     except Exception as e:

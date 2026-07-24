@@ -138,6 +138,7 @@ def ask_question(payload: dict = Body(...)):
 
     return {
         "question": question,
+        "query_plan": plan,
         **result
     }
 

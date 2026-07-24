@@ -6,6 +6,7 @@ from app.services.metrics_service import get_metric
 def execute_query_plan(plan: dict):
     """
     Execute a semantic query plan and return the result.
+    Supports one or more metrics.
     """
 
     if not plan["metrics"]:
@@ -28,18 +29,21 @@ def execute_query_plan(plan: dict):
 
         metrics.append(metric)
 
-    if metric is None:
-        return {
-            "status": "Failed",
-            "message": "Metric not found."
-        }
-
     sql = generate_sql_from_plan(plan)
 
     result = execute_query(sql)
 
     if result["status"] == "Failed":
         return result
+
+    row = result["result"]
+
+    values = {}
+
+    if row:
+
+        for index, metric in enumerate(metrics):
+            values[metric["display_name"]] = row[index]
 
     return {
         "metrics": [
@@ -48,5 +52,5 @@ def execute_query_plan(plan: dict):
         ],
         "filters": plan["filters"],
         "sql": sql,
-        "value": result["result"]
+        "values": values
     }
