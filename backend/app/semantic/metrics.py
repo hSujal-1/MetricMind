@@ -3,15 +3,15 @@
 SEMANTIC_METRICS = {
     "total_sales": {
         "display_name": "Total Sales",
-        "aliases": [
-            "sales",
-            "total sales",
-            "revenue",
-            "overall sales",
-            "sales amount",
-            "total revenue",
-            "how much did we sell"
-        ],
+        "aliases": {
+            "sales": 1,
+            "total sales": 3,
+            "revenue": 3,
+            "overall sales": 2,
+            "sales amount": 2,
+            "total revenue": 3,
+            "how much did we sell": 2
+        },
         "table": "GLOBAL_SUPERSTORE",
         "column": "SALES",
         "aggregation": "SUM",
@@ -20,14 +20,14 @@ SEMANTIC_METRICS = {
 
     "total_profit": {
         "display_name": "Total Profit",
-        "aliases": [
-            "profit",
-            "total profit",
-            "overall profit",
-            "earnings",
-            "net profit",
-            "profit amount"
-        ],
+        "aliases": {
+            "profit": 2,
+            "total profit": 3,
+            "overall profit": 2,
+            "earnings": 3,
+            "net profit": 3,
+            "profit amount": 2
+        },
         "table": "GLOBAL_SUPERSTORE",
         "column": "PROFIT",
         "aggregation": "SUM",
@@ -36,13 +36,13 @@ SEMANTIC_METRICS = {
 
     "total_orders": {
         "display_name": "Total Orders",
-        "aliases": [
-            "orders",
-            "total orders",
-            "order count",
-            "number of orders",
-            "customer orders"
-        ],
+        "aliases": {
+            "orders": 2,
+            "total orders": 3,
+            "order count": 3,
+            "number of orders": 3,
+            "customer orders": 2
+        },
         "table": "GLOBAL_SUPERSTORE",
         "column": "ORDER_ID",
         "aggregation": "COUNT",
@@ -51,13 +51,13 @@ SEMANTIC_METRICS = {
 
     "average_discount": {
         "display_name": "Average Discount",
-        "aliases": [
-            "discount",
-            "average discount",
-            "avg discount",
-            "discount percentage",
-            "mean discount"
-        ],
+        "aliases": {
+            "discount": 2,
+            "average discount": 3,
+            "avg discount": 3,
+            "discount percentage": 2,
+            "mean discount": 2
+        },
         "table": "GLOBAL_SUPERSTORE",
         "column": "DISCOUNT",
         "aggregation": "AVG",

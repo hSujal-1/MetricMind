@@ -13,8 +13,12 @@ from app.services.metrics_service import (
 )
 
 from app.services.sql_generator import generate_sql
-from app.services.nlp_service import detect_metric
+from app.services.nlp_service import (
+    detect_metric,
+    detect_metrics
+)
 from app.services.filter_service import detect_filters
+from app.services.query_planner import build_query_plan
 
 router = APIRouter(
     prefix="/api",
@@ -147,3 +151,42 @@ def ask_question(payload: dict = Body(...)):
         "sql": sql,
         "value": result["result"]
     }
+
+@router.post("/ask-multi")
+def ask_multi(payload: dict = Body(...)):
+    """
+    Detect multiple semantic metrics from
+    a natural language question.
+    """
+
+    question = payload.get("question", "")
+
+    matched_metrics = detect_metrics(question)
+
+    if not matched_metrics:
+        return {
+            "status": "Failed",
+            "message": "No matching metrics found."
+        }
+
+    return {
+        "question": question,
+        "metrics": [
+            {
+                "metric": item["metric"]["display_name"],
+                "score": item["score"]
+            }
+            for item in matched_metrics
+        ]
+    }
+@router.post("/query-plan")
+def query_plan(payload: dict = Body(...)):
+    """
+    Build and return the semantic query plan.
+    """
+
+    question = payload.get("question", "")
+
+    plan = build_query_plan(question)
+
+    return plan

@@ -4,7 +4,7 @@ from app.semantic.metrics import SEMANTIC_METRICS
 def detect_metric(question: str):
     """
     Detects the best matching semantic metric
-    using display names and aliases.
+    using weighted display names and aliases.
     """
 
     question = question.lower()
@@ -17,14 +17,16 @@ def detect_metric(question: str):
 
         score = 0
 
-        # Higher weight for display name
+        # Display name carries high weight
         if metric["display_name"].lower() in question:
-            score += 3
+            score += 5
 
-        # Lower weight for aliases
-        for alias in metric.get("aliases", []):
+        # Weighted aliases
+        aliases = metric.get("aliases", {})
+
+        for alias, weight in aliases.items():
             if alias.lower() in question:
-                score += 1
+                score += weight
 
         # Keep the highest scoring metric
         if score > best_score:
@@ -36,3 +38,45 @@ def detect_metric(question: str):
         return None, None
 
     return best_metric_name, best_metric
+
+def detect_metrics(question: str):
+    """
+    Detect all matching semantic metrics.
+    """
+
+    question = question.lower()
+
+    matched_metrics = []
+
+    for metric_name, metric in SEMANTIC_METRICS.items():
+
+        score = 0
+
+        # Display name
+        if metric["display_name"].lower() in question:
+            score += 5
+
+        # Weighted aliases
+        aliases = metric.get("aliases", {})
+
+        for alias, weight in aliases.items():
+
+            if alias.lower() in question:
+                score += weight
+
+        if score > 0:
+
+            matched_metrics.append(
+                {
+                    "metric_name": metric_name,
+                    "metric": metric,
+                    "score": score
+                }
+            )
+
+    matched_metrics.sort(
+        key=lambda x: x["score"],
+        reverse=True
+    )
+
+    return matched_metrics
