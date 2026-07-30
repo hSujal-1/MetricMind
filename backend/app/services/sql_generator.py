@@ -34,6 +34,7 @@ FROM {metric['table']}
 def generate_sql_from_plan(plan: dict):
     """
     Generate SQL from a semantic query plan.
+
     Supports:
     - Multiple metrics
     - Filters
@@ -41,6 +42,7 @@ def generate_sql_from_plan(plan: dict):
     - ORDER BY
     - LIMIT
     - Comparison queries
+    - Time comparison queries
     """
 
     metrics = plan.get("metrics", [])
@@ -49,9 +51,17 @@ def generate_sql_from_plan(plan: dict):
     order_by = plan.get("order_by")
     limit = plan.get("limit")
     comparison = plan.get("comparison")
+    time_comparison = plan.get("time_comparison")
 
     if not metrics:
         return None
+
+    # Make a copy so we don't modify the original plan
+    group_by = list(group_by)
+
+    # Automatically GROUP BY YEAR for time comparisons
+    if time_comparison and "YEAR" not in group_by:
+        group_by.append("YEAR")
 
     select_parts = []
 
@@ -86,9 +96,16 @@ FROM {table_name}
     conditions = []
 
     # Existing filters
-    if filters:
+    for column, value in filters.items():
 
-        for column, value in filters.items():
+        # Numeric filters (YEAR, WEEKNUM)
+        if isinstance(value, int):
+            conditions.append(
+                f"{column} = {value}"
+            )
+
+        # String filters
+        else:
             conditions.append(
                 f"{column} = '{value}'"
             )
@@ -103,6 +120,18 @@ FROM {table_name}
 
         conditions.append(
             f"{comparison['dimension']} IN ({values})"
+        )
+
+    # Time comparison filters
+    if time_comparison:
+
+        years = ", ".join(
+            str(year)
+            for year in time_comparison["years"]
+        )
+
+        conditions.append(
+            f"YEAR IN ({years})"
         )
 
     if conditions:

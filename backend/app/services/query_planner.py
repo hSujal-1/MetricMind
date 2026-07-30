@@ -1,5 +1,9 @@
 from app.services.nlp_service import detect_metrics
 from app.services.filter_service import detect_filters
+from app.services.time_filter_service import (
+    detect_time_filters,
+    detect_time_comparison
+)
 from app.services.groupby_service import detect_group_by
 from app.services.orderby_service import detect_order_by
 from app.services.limit_service import detect_limit
@@ -14,14 +18,28 @@ def build_query_plan(question: str):
 
     matched_metrics = detect_metrics(question)
 
+    # Detect filters
     filters = detect_filters(question)
+
+    # Detect time filters (Year, etc.)
+    time_filters = detect_time_filters(question)
+
+    # Merge normal filters and time filters
+    filters.update(time_filters)
+
     group_by = detect_group_by(question)
     order_by = detect_order_by(question, matched_metrics)
     limit = detect_limit(question)
+
     comparison = detect_comparison(question)
+    time_comparison = detect_time_comparison(question)
 
     # If it's a comparison query, don't use normal filters
     if comparison:
+        filters = {}
+
+    # If it's a time comparison query, don't use single YEAR filter
+    if time_comparison:
         filters = {}
 
     # Automatically GROUP BY the comparison dimension
@@ -41,7 +59,12 @@ def build_query_plan(question: str):
         "order_by": order_by,
         "limit": limit,
 
-        # Reserved for future semantic capabilities
+        # Semantic comparison
         "comparison": comparison,
+
+        # Time comparison (Year-over-Year)
+        "time_comparison": time_comparison,
+
+        # Reserved for future semantic capabilities
         "having": None
     }
