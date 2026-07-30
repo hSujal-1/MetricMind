@@ -1,5 +1,6 @@
 from app.services.nlp_service import detect_metrics
 from app.services.filter_service import detect_filters
+from app.services.groupby_service import detect_group_by
 
 
 def build_query_plan(question: str):
@@ -11,6 +12,7 @@ def build_query_plan(question: str):
     matched_metrics = detect_metrics(question)
 
     filters = detect_filters(question)
+    group_by = detect_group_by(question)
 
     metric_names = []
 
@@ -20,5 +22,8 @@ def build_query_plan(question: str):
     return {
         "question": question,
         "metrics": metric_names,
-        "filters": filters
+        "filters": filters,
+        "group_by": group_by,
+        "order_by": None,
+        "limit": None
     }

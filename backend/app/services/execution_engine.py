@@ -1,5 +1,8 @@
 from app.services.sql_generator import generate_sql_from_plan
-from app.services.snowflake_service import execute_query
+from app.services.snowflake_service import (
+    execute_query,
+    execute_table_query
+)
 from app.services.metrics_service import get_metric
 
 

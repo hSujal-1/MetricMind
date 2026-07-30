@@ -73,48 +73,50 @@ def get_tables():
         if conn:
             conn.close()
 
+
 def get_table_columns(table_name):
-        """
-        Returns column names and data types for a table.
-        """
+    """
+    Returns column names and data types for a table.
+    """
 
-        conn = None
-        cur = None
+    conn = None
+    cur = None
 
-        try:
-            conn = get_connection()
-            cur = conn.cursor()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
 
-            cur.execute(f"DESC TABLE {table_name};")
+        cur.execute(f"DESC TABLE {table_name};")
 
-            rows = cur.fetchall()
+        rows = cur.fetchall()
 
-            columns = []
+        columns = []
 
-            for row in rows:
-                columns.append({
-                    "name": row[0],
-                    "type": row[1]
-                })
+        for row in rows:
+            columns.append({
+                "name": row[0],
+                "type": row[1]
+            })
 
-            return {
-                "table": table_name,
-                "column_count": len(columns),
-                "columns": columns
-            }
+        return {
+            "table": table_name,
+            "column_count": len(columns),
+            "columns": columns
+        }
 
-        except Exception as e:
-            return {
-                "status": "Failed",
-                "error": str(e)
-            }
+    except Exception as e:
+        return {
+            "status": "Failed",
+            "error": str(e)
+        }
 
-        finally:
-            if cur:
-                cur.close()
+    finally:
+        if cur:
+            cur.close()
 
-            if conn:
-                conn.close()
+        if conn:
+            conn.close()
+
 
 def execute_query(sql: str):
     """
@@ -151,6 +153,49 @@ def execute_query(sql: str):
         if conn:
             conn.close()
 
+
+def execute_table_query(sql: str):
+    """
+    Executes SQL and returns all rows with column names.
+    Intended for GROUP BY and visualization queries.
+    """
+
+    conn = None
+    cur = None
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute(sql)
+
+        rows = cur.fetchall()
+
+        columns = [
+            column[0]
+            for column in cur.description
+        ]
+
+        return {
+            "status": "Success",
+            "columns": columns,
+            "rows": rows
+        }
+
+    except Exception as e:
+        return {
+            "status": "Failed",
+            "error": str(e)
+        }
+
+    finally:
+        if cur:
+            cur.close()
+
+        if conn:
+            conn.close()
+
+
 def get_distinct_values(table_name: str, column_name: str):
     """
     Returns distinct values from a table column.
@@ -176,7 +221,7 @@ def get_distinct_values(table_name: str, column_name: str):
 
         return [row[0] for row in rows]
 
-    except Exception as e:
+    except Exception:
         return []
 
     finally:

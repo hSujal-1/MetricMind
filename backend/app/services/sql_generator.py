@@ -39,11 +39,17 @@ def generate_sql_from_plan(plan: dict):
 
     metrics = plan.get("metrics", [])
     filters = plan.get("filters", {})
+    group_by = plan.get("group_by", [])
 
     if not metrics:
         return None
 
     select_parts = []
+
+    # Add GROUP BY columns first
+    for column in group_by:
+        select_parts.append(column)
+
     table_name = None
 
     for metric_name in metrics:
@@ -75,7 +81,8 @@ FROM {table_name}
             )
 
         sql += "WHERE " + " AND ".join(conditions)
-
+    if group_by:
+        sql += "\nGROUP BY " + ", ".join(group_by)
     sql += ";"
 
     return sql.strip()
