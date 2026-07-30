@@ -40,6 +40,8 @@ def generate_sql_from_plan(plan: dict):
     metrics = plan.get("metrics", [])
     filters = plan.get("filters", {})
     group_by = plan.get("group_by", [])
+    order_by = plan.get("order_by")
+    limit = plan.get("limit")
 
     if not metrics:
         return None
@@ -81,8 +83,26 @@ FROM {table_name}
             )
 
         sql += "WHERE " + " AND ".join(conditions)
+
     if group_by:
         sql += "\nGROUP BY " + ", ".join(group_by)
+
+    # Add ORDER BY clause
+    if order_by:
+
+        metric = get_metric(order_by["column"])
+
+        if metric:
+
+            sql += (
+                f"\nORDER BY {order_by['column'].upper()} "
+                f"{order_by['direction']}"
+            )
+
+    # Add LIMIT clause
+    if limit:
+        sql += f"\nLIMIT {limit}"
+
     sql += ";"
 
     return sql.strip()

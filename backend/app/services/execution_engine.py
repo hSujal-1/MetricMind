@@ -9,7 +9,7 @@ from app.services.metrics_service import get_metric
 def execute_query_plan(plan: dict):
     """
     Execute a semantic query plan and return the result.
-    Supports one or more metrics.
+    Supports KPI queries and GROUP BY table queries.
     """
 
     if not plan["metrics"]:
@@ -34,11 +34,46 @@ def execute_query_plan(plan: dict):
 
     sql = generate_sql_from_plan(plan)
 
-    result = execute_query(sql)
+    # Decide execution strategy
+    if plan.get("group_by"):
+
+        result = execute_table_query(sql)
+
+    else:
+
+        result = execute_query(sql)
 
     if result["status"] == "Failed":
         return result
 
+    # GROUP BY queries return table data
+    if plan.get("group_by"):
+
+        table_rows = []
+
+        for row in result["rows"]:
+
+            row_data = {}
+
+            for index, column in enumerate(result["columns"]):
+                row_data[column] = row[index]
+
+            table_rows.append(row_data)
+
+        return {
+            "query_type": "table",
+            "metrics": [
+                metric["display_name"]
+                for metric in metrics
+            ],
+            "filters": plan["filters"],
+            "group_by": plan["group_by"],
+            "sql": sql,
+            "columns": result["columns"],
+            "rows": table_rows
+        }
+
+    # KPI queries
     row = result["result"]
 
     values = {}
@@ -49,6 +84,7 @@ def execute_query_plan(plan: dict):
             values[metric["display_name"]] = row[index]
 
     return {
+        "query_type": "kpi",
         "metrics": [
             metric["display_name"]
             for metric in metrics
