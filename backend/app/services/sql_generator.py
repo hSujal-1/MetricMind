@@ -17,14 +17,14 @@ SELECT {metric['aggregation']}({metric['column']})
 FROM {metric['table']}
 """
 
-    # Add WHERE clause if filters exist
     if filters:
+
         conditions = []
 
         for column, value in filters.items():
             conditions.append(f"{column} = '{value}'")
 
-        sql += "WHERE " + " AND ".join(conditions)
+        sql += "\nWHERE " + " AND ".join(conditions)
 
     sql += ";"
 
@@ -34,7 +34,13 @@ FROM {metric['table']}
 def generate_sql_from_plan(plan: dict):
     """
     Generate SQL from a semantic query plan.
-    Supports one or more metrics.
+    Supports:
+    - Multiple metrics
+    - Filters
+    - GROUP BY
+    - ORDER BY
+    - LIMIT
+    - Comparison queries
     """
 
     metrics = plan.get("metrics", [])
@@ -42,6 +48,7 @@ def generate_sql_from_plan(plan: dict):
     group_by = plan.get("group_by", [])
     order_by = plan.get("order_by")
     limit = plan.get("limit")
+    comparison = plan.get("comparison")
 
     if not metrics:
         return None
@@ -73,21 +80,43 @@ SELECT
 FROM {table_name}
 """
 
-    if filters:
+    # -----------------------------
+    # WHERE clause
+    # -----------------------------
+    conditions = []
 
-        conditions = []
+    # Existing filters
+    if filters:
 
         for column, value in filters.items():
             conditions.append(
                 f"{column} = '{value}'"
             )
 
-        sql += "WHERE " + " AND ".join(conditions)
+    # Comparison filters
+    if comparison:
 
+        values = ", ".join(
+            f"'{value}'"
+            for value in comparison["values"]
+        )
+
+        conditions.append(
+            f"{comparison['dimension']} IN ({values})"
+        )
+
+    if conditions:
+        sql += "\nWHERE " + " AND ".join(conditions)
+
+    # -----------------------------
+    # GROUP BY
+    # -----------------------------
     if group_by:
         sql += "\nGROUP BY " + ", ".join(group_by)
 
-    # Add ORDER BY clause
+    # -----------------------------
+    # ORDER BY
+    # -----------------------------
     if order_by:
 
         metric = get_metric(order_by["column"])
@@ -99,7 +128,9 @@ FROM {table_name}
                 f"{order_by['direction']}"
             )
 
-    # Add LIMIT clause
+    # -----------------------------
+    # LIMIT
+    # -----------------------------
     if limit:
         sql += f"\nLIMIT {limit}"
 

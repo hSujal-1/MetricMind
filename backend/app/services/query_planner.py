@@ -3,6 +3,7 @@ from app.services.filter_service import detect_filters
 from app.services.groupby_service import detect_group_by
 from app.services.orderby_service import detect_order_by
 from app.services.limit_service import detect_limit
+from app.services.comparison_service import detect_comparison
 
 
 def build_query_plan(question: str):
@@ -17,6 +18,15 @@ def build_query_plan(question: str):
     group_by = detect_group_by(question)
     order_by = detect_order_by(question, matched_metrics)
     limit = detect_limit(question)
+    comparison = detect_comparison(question)
+
+    # If it's a comparison query, don't use normal filters
+    if comparison:
+        filters = {}
+
+    # Automatically GROUP BY the comparison dimension
+    if comparison and not group_by:
+        group_by = [comparison["dimension"]]
 
     metric_names = []
 
@@ -29,5 +39,9 @@ def build_query_plan(question: str):
         "filters": filters,
         "group_by": group_by,
         "order_by": order_by,
-        "limit": limit
+        "limit": limit,
+
+        # Reserved for future semantic capabilities
+        "comparison": comparison,
+        "having": None
     }
