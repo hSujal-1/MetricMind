@@ -1,110 +1,93 @@
-# 🚀 MetricMind
-
 <p align="center">
-
-![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi)
-![Snowflake](https://img.shields.io/badge/Snowflake-Cloud%20Warehouse-29B5E8?style=for-the-badge&logo=snowflake)
-![dbt](https://img.shields.io/badge/dbt-Analytics-FF694B?style=for-the-badge&logo=dbt)
-![GitHub](https://img.shields.io/badge/Open%20Source-GitHub-black?style=for-the-badge&logo=github)
-
+  <img src="https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python" alt="Python" />
+  <img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Snowflake-Cloud%20Warehouse-29B5E8?style=for-the-badge&logo=snowflake" alt="Snowflake" />
+  <img src="https://img.shields.io/badge/dbt-Analytics-FF694B?style=for-the-badge&logo=dbt" alt="dbt" />
+  <img src="https://img.shields.io/badge/License-MIT-black?style=for-the-badge" alt="License" />
 </p>
 
-<h3 align="center">
-Enterprise Semantic Business Intelligence Engine
-</h3>
+<h1 align="center">MetricMind</h1>
+<h3 align="center">Enterprise Semantic Business Intelligence Engine</h3>
 
 <p align="center">
-Transform natural language into governed business insights using a custom semantic layer, Snowflake, FastAPI and modern analytics engineering.
+  Turn natural language business questions into governed insights — powered by a custom semantic layer, Snowflake, dbt, and FastAPI.
+</p>
+
+<p align="center">
+  <a href="#-overview">Overview</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-api-reference">API</a> •
+  <a href="#-project-status">Status</a>
 </p>
 
 ---
 
-# 📖 Project Overview
+## Overview
 
-MetricMind is an enterprise-grade **Semantic Business Intelligence (BI) Engine** designed to bridge the gap between business users and enterprise data.
+**MetricMind** is a semantic Business Intelligence engine that bridges the gap between business users and enterprise data — without requiring anyone to write SQL.
 
-Instead of requiring users to write SQL, MetricMind understands natural language business questions, converts them into semantic query plans, generates optimized SQL, executes the queries on Snowflake, and returns structured business insights through REST APIs.
+It takes a natural language question, converts it into a semantic query plan, generates optimized SQL, executes it against **Snowflake**, and returns structured, governed business insights through a REST API.
 
-The project follows modern Analytics Engineering practices using **Snowflake**, **FastAPI**, **dbt**, and a custom-built semantic layer, making it scalable, modular, and AI-ready.
+Built on modern analytics engineering practices — **Snowflake**, **FastAPI**, **dbt**, and a custom semantic layer — MetricMind is designed to be modular, scalable, and AI-ready, supporting:
 
-MetricMind is being developed as a production-oriented analytics platform capable of supporting:
-
-- Semantic Metrics
-- Natural Language Querying
-- Intelligent SQL Generation
-- Business KPI Analytics
-- Enterprise Semantic Layer
-- AI-powered Business Intelligence (Upcoming)
+- Semantic metrics & KPI analytics
+- Natural language querying
+- Intelligent SQL generation
+- An enterprise-grade semantic layer
+- AI-powered conversational BI *(in progress)*
 
 ---
 
-# ✨ Current Features
+## Features
 
-## Semantic Intelligence
+<table>
+<tr>
+<td valign="top" width="50%">
 
-- ✅ Semantic Metric Detection
-- ✅ Natural Language Query Planning
-- ✅ Dynamic SQL Generation
-- ✅ Enterprise Semantic Layer
-- ✅ Snowflake Query Execution
+**Semantic Intelligence**
+- Semantic metric detection
+- Natural language query planning
+- Dynamic SQL generation
+- Enterprise semantic layer
+- Snowflake query execution
 
----
+**Business Intelligence**
+- KPI queries
+- Business filter detection
+- `GROUP BY` / `ORDER BY` / `LIMIT` detection
+- Aggregate filtering (`HAVING`)
 
-## Business Intelligence
+</td>
+<td valign="top" width="50%">
 
-- ✅ KPI Queries
-- ✅ Business Filter Detection
-- ✅ GROUP BY Detection
-- ✅ ORDER BY Detection
-- ✅ LIMIT Detection
-- ✅ Aggregate Filtering (HAVING)
+**Time Intelligence**
+- Year filters & date range queries
+- Relative time intelligence
+- Quarter intelligence & comparison
 
----
+**Comparison Engine**
+- State / category / quarter comparison
+- Multi-dimensional semantic queries
 
-## Time Intelligence
+**Backend**
+- FastAPI REST APIs
+- Metadata discovery APIs
+- Semantic query APIs
 
-- ✅ Year Filters
-- ✅ Relative Time Intelligence
-- ✅ Date Range Queries
-- ✅ Quarter Intelligence
-- ✅ Quarter Comparison
+</td>
+</tr>
+</table>
 
----
+### Upcoming
 
-## Comparison Engine
-
-- ✅ State Comparison
-- ✅ Category Comparison
-- ✅ Quarter Comparison
-- ✅ Multi-dimensional Semantic Queries
-
----
-
-## Backend APIs
-
-- ✅ FastAPI REST APIs
-- ✅ Metadata Discovery APIs
-- ✅ Semantic Query APIs
-- ✅ Snowflake Integration
+Conversational BI assistant · AI dashboard generation · Visualization recommendation engine · LangChain integration · Interactive analytics dashboard · Authentication & user management · Query history · KPI monitoring · Report export (PDF / Excel)
 
 ---
 
-## 🚧 Upcoming Features
-
-- Conversational BI Assistant
-- AI Dashboard Generation
-- Visualization Recommendation Engine
-- LangChain Integration
-- Interactive Analytics Dashboard
-- Authentication & User Management
-- Query History
-- KPI Monitoring
-- Report Export (PDF / Excel)
-
----
-
-# 🏗 Project Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -146,25 +129,24 @@ flowchart TD
 
 ---
 
-# 🛠 Technology Stack
+## Tech Stack
 
 | Layer | Technology |
-|--------|------------|
-| Programming Language | Python 3.13 |
+|---|---|
+| Language | Python 3.13 |
 | Backend Framework | FastAPI |
 | Database | Snowflake |
 | Data Transformation | dbt |
-| Semantic Layer | Custom Python Semantic Layer |
-| REST APIs | FastAPI |
-| AI Integration | LangChain *(Planned)* |
-| Frontend | Next.js *(Planned)* |
+| Semantic Layer | Custom Python semantic layer |
+| AI Integration | LangChain *(planned)* |
+| Frontend | Next.js *(planned)* |
 | Version Control | Git & GitHub |
 | IDE | PyCharm |
 | API Testing | Swagger UI / Postman |
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```text
 MetricMind/
@@ -182,13 +164,13 @@ MetricMind/
 │   │
 │   └── requirements.txt
 │
-├── frontend/                    # Next.js Frontend (Upcoming)
-├── dashboard/                   # Dashboard (Upcoming)
-├── dbt/                         # dbt Models
+├── frontend/                    # Next.js frontend (upcoming)
+├── dashboard/                   # Dashboard (upcoming)
+├── dbt/                         # dbt models
 ├── docs/                        # Documentation
-├── sql/                         # SQL Scripts
-├── images/                      # Project Images
-├── tests/                       # Unit Tests
+├── sql/                         # SQL scripts
+├── images/                      # Project images
+├── tests/                       # Unit tests
 │
 ├── README.md
 └── .gitignore
@@ -196,12 +178,43 @@ MetricMind/
 
 ---
 
-# 📡 REST API Endpoints
+## Installation
 
-MetricMind exposes REST APIs for metadata discovery and semantic business queries.
+```bash
+# Clone the repository
+git clone https://github.com/hSujal-1/MetricMind.git
+cd MetricMind
+
+# Create a virtual environment
+python -m venv .venv
+
+# Activate it
+# Windows
+.venv\Scripts\activate
+# Linux / macOS
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r backend/requirements.txt
+```
+
+### Running the project
+
+```bash
+uvicorn app.main:app --reload
+```
+
+| Docs | URL |
+|---|---|
+| Swagger UI | `http://127.0.0.1:8000/docs` |
+| ReDoc | `http://127.0.0.1:8000/redoc` |
+
+---
+
+## API Reference
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|---|---|---|
 | GET | `/` | Welcome endpoint |
 | GET | `/health` | Health check |
 | GET | `/db-health` | Verify Snowflake connection |
@@ -209,15 +222,14 @@ MetricMind exposes REST APIs for metadata discovery and semantic business querie
 | GET | `/tables/{table_name}/columns` | Retrieve table schema |
 | POST | `/queryplanner` | Generate semantic query plan |
 | POST | `/generate-sql` | Generate SQL from semantic query plan |
-| POST | `/ask` | Execute natural language query and return results |
+| POST | `/ask` | Execute a natural language query and return results |
 
 ---
 
-# 💬 Example Natural Language Queries
+## Example Queries
 
-MetricMind currently understands a wide variety of business questions.
-
-## 📊 KPI Queries
+<details>
+<summary><strong>KPI queries</strong></summary>
 
 ```text
 Total Sales
@@ -226,10 +238,10 @@ Total Orders
 Total Quantity
 Average Discount
 ```
+</details>
 
----
-
-## 🏢 Business Filters
+<details>
+<summary><strong>Business filters</strong></summary>
 
 ```text
 Sales in California
@@ -238,10 +250,10 @@ Technology Sales
 Furniture Profit
 Office Supplies Orders
 ```
+</details>
 
----
-
-## 📈 Group By Queries
+<details>
+<summary><strong>Group by queries</strong></summary>
 
 ```text
 Sales by City
@@ -250,10 +262,10 @@ Orders by State
 Sales by Region
 Profit by Segment
 ```
+</details>
 
----
-
-## 🏆 Ranking Queries
+<details>
+<summary><strong>Ranking queries</strong></summary>
 
 ```text
 Top 10 Cities by Sales
@@ -262,30 +274,30 @@ Highest Profit States
 Lowest Sales Regions
 Top 20 Cities by Orders
 ```
+</details>
 
----
-
-## 🔍 Aggregate Filtering (HAVING)
+<details>
+<summary><strong>Aggregate filtering (HAVING)</strong></summary>
 
 ```text
 Cities with Sales above 500000
 Categories with Profit below 10000
 States with Orders above 2000
 ```
+</details>
 
----
-
-## 🔄 Business Comparison Queries
+<details>
+<summary><strong>Comparison queries</strong></summary>
 
 ```text
 Compare California and Texas Sales
 Compare Technology and Furniture Profit
 Compare Office Supplies and Technology Orders
 ```
+</details>
 
----
-
-## 📅 Time Intelligence
+<details>
+<summary><strong>Time intelligence</strong></summary>
 
 ```text
 Sales in 2014
@@ -295,10 +307,10 @@ Orders this year
 Sales last year
 Profit previous year
 ```
+</details>
 
----
-
-## 🗓 Quarter Intelligence
+<details>
+<summary><strong>Quarter intelligence</strong></summary>
 
 ```text
 Sales in Q1
@@ -309,166 +321,46 @@ Profit in Q4 this year
 Compare Q1 and Q2 Sales
 Compare Q3 and Q4 Profit
 ```
+</details>
 
----
-
-## 🚀 Complex Semantic Queries
+<details>
+<summary><strong>Complex semantic queries</strong></summary>
 
 ```text
 Top 10 Cities with Sales between 2012 and 2014
-
 Top 5 Categories with Sales above 500000
-
 Compare Technology and Furniture Profit
-
 Compare Q1 and Q2 Sales in 2014
-
 Sales in California during Q2
-
 Categories with Profit after 2013
-
 Top 10 Cities by Profit in Q3
 ```
+</details>
 
 ---
 
-# 🧠 Semantic Engine Capabilities
+## Project Status
 
-MetricMind converts natural language into optimized SQL using a modular semantic engine.
+**Status:** 🟢 Active development &nbsp;|&nbsp; **Version:** v0.9 (Backend) &nbsp;|&nbsp; **Backend completion:** ~92%
 
-Current semantic capabilities include:
-
-| Capability | Status |
-|------------|:------:|
-| Semantic Metric Detection | ✅ |
-| Business Filter Detection | ✅ |
-| Query Planning | ✅ |
-| Dynamic SQL Generation | ✅ |
-| Snowflake Execution | ✅ |
-| GROUP BY Detection | ✅ |
-| ORDER BY Detection | ✅ |
-| LIMIT Detection | ✅ |
-| Aggregate Filtering (HAVING) | ✅ |
-| Business Comparisons | ✅ |
-| Relative Time Intelligence | ✅ |
-| Date Range Intelligence | ✅ |
-| Quarter Intelligence | ✅ |
-| Quarter Comparison | ✅ |
+| Module |      Status      |
+|---|:----------------:|
+| Backend APIs | Completed (core) |
+| Semantic query engine |    Completed     |
+| Snowflake integration |    Completed     |
+| Natural language query planner |    Completed     |
+| Dynamic SQL generator |     Completed    |
+| Frontend dashboard |   In progress  |
+| AI copilot (LLM) |     Planned    |
 
 ---
 
-# ⚙️ Installation
+## Vision
 
-Clone the repository
-
-```bash
-git clone https://github.com/<your-username>/MetricMind.git
-```
-
-Navigate into the project
-
-```bash
-cd MetricMind
-```
-
-Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-Activate the environment
-
-Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-Linux / macOS
-
-```bash
-source .venv/bin/activate
-```
-
-Install dependencies
-
-```bash
-pip install -r backend/requirements.txt
-```
+The long-term goal is to evolve MetricMind into a full AI-powered BI platform — supporting conversational analytics, intelligent dashboard generation, and automated business insights on top of the semantic layer already in place.
 
 ---
 
-# ▶️ Running the Project
+## License
 
-Start the FastAPI server
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Open Swagger UI
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Open ReDoc
-
-```text
-http://127.0.0.1:8000/redoc
-```
----
-
-# 📊 Current Project Progress
-
-MetricMind is under active development.
-
-| Module | Status |
-|---------|:------:|
-| Backend APIs | ✅ Completed (Core) |
-| Semantic Query Engine | ✅ Completed |
-| Snowflake Integration | ✅ Completed |
-| Natural Language Query Planner | ✅ Completed |
-| Dynamic SQL Generator | ✅ Completed |
-| Frontend Dashboard | 🚧 In Progress |
-| AI Copilot (LLM) | 🚧 Planned |
-
----
-
-# 🚀 Project Status
-
-**Status:** 🟢 Active Development
-
-**Current Version:** v0.9 (Backend)
-
-**Backend Completion:** ~92%
-
----
-
-# 🎯 Why MetricMind?
-
-MetricMind is designed to simplify business analytics by allowing users to interact with enterprise data using natural language instead of writing SQL.
-
-Current capabilities include:
-
-- Semantic Metric Detection
-- Natural Language Query Planning
-- Dynamic SQL Generation
-- Snowflake Query Execution
-- Business Filter Detection
-- GROUP BY, ORDER BY & LIMIT Intelligence
-- Aggregate Filtering (HAVING)
-- Business Comparisons
-- Relative Time Intelligence
-- Date Range Queries
-- Quarter Intelligence
-- Quarter Comparison
-
-The long-term vision is to evolve MetricMind into an AI-powered Business Intelligence platform capable of conversational analytics, intelligent dashboard generation, and automated business insights.
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
+Licensed under the [MIT License](LICENSE).
