@@ -230,3 +230,30 @@ def get_distinct_values(table_name: str, column_name: str):
 
         if conn:
             conn.close()
+def get_latest_year():
+    """
+    Returns the latest available YEAR
+    from the dataset.
+    """
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute(
+            """
+            SELECT MAX(YEAR)
+            FROM GLOBAL_SUPERSTORE
+            """
+        )
+
+        result = cursor.fetchone()
+
+        return result[0]
+
+    finally:
+
+        cursor.close()
+        conn.close()

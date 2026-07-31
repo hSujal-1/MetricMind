@@ -10,6 +10,7 @@ from app.services.limit_service import detect_limit
 from app.services.comparison_service import detect_comparison
 from app.services.having_service import detect_having
 from app.services.date_range_service import detect_date_range
+from app.services.relative_time_service import detect_relative_time
 
 
 def build_query_plan(question: str):
@@ -23,14 +24,17 @@ def build_query_plan(question: str):
     # Detect filters
     filters = detect_filters(question)
 
-    # Detect date range first
     date_range = detect_date_range(question)
 
-    # Detect time filters (Year, etc.)
+    relative_time = detect_relative_time(question)
+
     time_filters = detect_time_filters(question)
 
-    # Apply exact year filter only if no date range exists
-    if not date_range:
+    # Relative time has priority over explicit year detection
+    if relative_time:
+        filters.update(relative_time)
+
+    elif not date_range:
         filters.update(time_filters)
 
     group_by = detect_group_by(question)
