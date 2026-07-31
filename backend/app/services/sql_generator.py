@@ -44,6 +44,7 @@ def generate_sql_from_plan(plan: dict):
     - LIMIT
     - Comparison queries
     - Time comparison queries
+    - Date range queries
     """
 
     metrics = plan.get("metrics", [])
@@ -53,6 +54,7 @@ def generate_sql_from_plan(plan: dict):
     limit = plan.get("limit")
     comparison = plan.get("comparison")
     time_comparison = plan.get("time_comparison")
+    date_range = plan.get("date_range")
     having = plan.get("having")
 
     if not metrics:
@@ -135,6 +137,23 @@ FROM {table_name}
         conditions.append(
             f"YEAR IN ({years})"
         )
+
+    # -----------------------------
+    # Date range filters
+    # -----------------------------
+    if date_range:
+
+        if date_range["operator"] == "BETWEEN":
+
+            conditions.append(
+                f"YEAR BETWEEN {date_range['start']} AND {date_range['end']}"
+            )
+
+        else:
+
+            conditions.append(
+                f"YEAR {date_range['operator']} {date_range['year']}"
+            )
 
     if conditions:
         sql += "\nWHERE " + " AND ".join(conditions)

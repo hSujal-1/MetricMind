@@ -9,6 +9,7 @@ from app.services.orderby_service import detect_order_by
 from app.services.limit_service import detect_limit
 from app.services.comparison_service import detect_comparison
 from app.services.having_service import detect_having
+from app.services.date_range_service import detect_date_range
 
 
 def build_query_plan(question: str):
@@ -22,11 +23,15 @@ def build_query_plan(question: str):
     # Detect filters
     filters = detect_filters(question)
 
+    # Detect date range first
+    date_range = detect_date_range(question)
+
     # Detect time filters (Year, etc.)
     time_filters = detect_time_filters(question)
 
-    # Merge normal filters and time filters
-    filters.update(time_filters)
+    # Apply exact year filter only if no date range exists
+    if not date_range:
+        filters.update(time_filters)
 
     group_by = detect_group_by(question)
     order_by = detect_order_by(question, matched_metrics)
@@ -35,6 +40,9 @@ def build_query_plan(question: str):
     comparison = detect_comparison(question)
     time_comparison = detect_time_comparison(question)
     having = detect_having(question)
+    # A date range takes precedence over year-over-year comparison
+    if date_range:
+        time_comparison = None
 
     # If it's a comparison query, don't use normal filters
     if comparison:
@@ -67,6 +75,9 @@ def build_query_plan(question: str):
         # Time comparison (Year-over-Year)
         "time_comparison": time_comparison,
 
-        # Reserved for future semantic capabilities
+        # Date range
+        "date_range": date_range,
+
+        # Aggregate filtering
         "having": having
     }

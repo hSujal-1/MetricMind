@@ -4,6 +4,9 @@ Filter Detection Service
 Extracts business filters
 from natural language questions.
 """
+
+import re
+
 from app.services.snowflake_service import get_distinct_values
 
 FILTER_VALUES = {
@@ -60,7 +63,9 @@ def detect_filters(question: str):
 
             for alias in aliases:
 
-                if alias.lower() in question:
+                pattern = rf"\b{re.escape(alias.lower())}\b"
+
+                if re.search(pattern, question):
                     filters[column] = actual_value
                     break
 
