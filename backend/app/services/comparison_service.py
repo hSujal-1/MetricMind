@@ -1,3 +1,5 @@
+import re
+
 from app.services.snowflake_service import get_distinct_values
 
 TABLE_NAME = "GLOBAL_SUPERSTORE"
@@ -30,7 +32,9 @@ def detect_comparison(question: str):
 
         for value in values:
 
-            if value.lower() in question:
+            pattern = rf"\b{re.escape(value.lower())}\b"
+
+            if re.search(pattern, question):
                 matched.append(value)
 
         if len(matched) >= 2:

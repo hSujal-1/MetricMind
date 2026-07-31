@@ -39,6 +39,7 @@ def generate_sql_from_plan(plan: dict):
     - Multiple metrics
     - Filters
     - GROUP BY
+    - HAVING
     - ORDER BY
     - LIMIT
     - Comparison queries
@@ -52,6 +53,7 @@ def generate_sql_from_plan(plan: dict):
     limit = plan.get("limit")
     comparison = plan.get("comparison")
     time_comparison = plan.get("time_comparison")
+    having = plan.get("having")
 
     if not metrics:
         return None
@@ -142,6 +144,22 @@ FROM {table_name}
     # -----------------------------
     if group_by:
         sql += "\nGROUP BY " + ", ".join(group_by)
+
+    # -----------------------------
+    # HAVING
+    # -----------------------------
+    if having:
+
+        metric = get_metric(having["metric"])
+
+        if metric:
+
+            sql += (
+                f"\nHAVING "
+                f"{metric['aggregation']}({metric['column']}) "
+                f"{having['operator']} "
+                f"{having['value']}"
+            )
 
     # -----------------------------
     # ORDER BY

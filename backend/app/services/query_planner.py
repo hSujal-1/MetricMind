@@ -8,6 +8,7 @@ from app.services.groupby_service import detect_group_by
 from app.services.orderby_service import detect_order_by
 from app.services.limit_service import detect_limit
 from app.services.comparison_service import detect_comparison
+from app.services.having_service import detect_having
 
 
 def build_query_plan(question: str):
@@ -33,6 +34,7 @@ def build_query_plan(question: str):
 
     comparison = detect_comparison(question)
     time_comparison = detect_time_comparison(question)
+    having = detect_having(question)
 
     # If it's a comparison query, don't use normal filters
     if comparison:
@@ -66,5 +68,5 @@ def build_query_plan(question: str):
         "time_comparison": time_comparison,
 
         # Reserved for future semantic capabilities
-        "having": None
+        "having": having
     }
