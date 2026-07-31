@@ -11,6 +11,8 @@ from app.services.comparison_service import detect_comparison
 from app.services.having_service import detect_having
 from app.services.date_range_service import detect_date_range
 from app.services.relative_time_service import detect_relative_time
+from app.services.quarter_service import detect_quarter
+from app.services.quarter_comparison_service import detect_quarter_comparison
 
 
 def build_query_plan(question: str):
@@ -29,6 +31,7 @@ def build_query_plan(question: str):
     relative_time = detect_relative_time(question)
 
     time_filters = detect_time_filters(question)
+    quarter_filters = detect_quarter(question)
 
     # Relative time has priority over explicit year detection
     if relative_time:
@@ -37,13 +40,18 @@ def build_query_plan(question: str):
     elif not date_range:
         filters.update(time_filters)
 
+    # Quarter filters
+    filters.update(quarter_filters)
+
     group_by = detect_group_by(question)
     order_by = detect_order_by(question, matched_metrics)
     limit = detect_limit(question)
 
     comparison = detect_comparison(question)
+    quarter_comparison = detect_quarter_comparison(question)
     time_comparison = detect_time_comparison(question)
     having = detect_having(question)
+
     # A date range takes precedence over year-over-year comparison
     if date_range:
         time_comparison = None
@@ -52,13 +60,23 @@ def build_query_plan(question: str):
     if comparison:
         filters = {}
 
-    # If it's a time comparison query, don't use single YEAR filter
+    # If it's a quarter comparison query,
+    # remove the normal QUARTER filter
+    if quarter_comparison:
+        filters.pop("QUARTER", None)
+
+    # If it's a time comparison query,
+    # don't use single YEAR filter
     if time_comparison:
         filters = {}
 
-    # Automatically GROUP BY the comparison dimension
+    # Automatically GROUP BY comparison dimension
     if comparison and not group_by:
         group_by = [comparison["dimension"]]
+
+    # Automatically GROUP BY QUARTER
+    if quarter_comparison and not group_by:
+        group_by = ["QUARTER"]
 
     metric_names = []
 
@@ -75,6 +93,9 @@ def build_query_plan(question: str):
 
         # Semantic comparison
         "comparison": comparison,
+
+        # Quarter comparison
+        "quarter_comparison": quarter_comparison,
 
         # Time comparison (Year-over-Year)
         "time_comparison": time_comparison,

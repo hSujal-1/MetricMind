@@ -43,6 +43,7 @@ def generate_sql_from_plan(plan: dict):
     - ORDER BY
     - LIMIT
     - Comparison queries
+    - Quarter comparison queries
     - Time comparison queries
     - Date range queries
     """
@@ -53,6 +54,7 @@ def generate_sql_from_plan(plan: dict):
     order_by = plan.get("order_by")
     limit = plan.get("limit")
     comparison = plan.get("comparison")
+    quarter_comparison = plan.get("quarter_comparison")
     time_comparison = plan.get("time_comparison")
     date_range = plan.get("date_range")
     having = plan.get("having")
@@ -102,7 +104,7 @@ FROM {table_name}
     # Existing filters
     for column, value in filters.items():
 
-        # Numeric filters (YEAR, WEEKNUM)
+        # Numeric filters (YEAR, WEEKNUM, QUARTER)
         if isinstance(value, int):
             conditions.append(
                 f"{column} = {value}"
@@ -114,7 +116,9 @@ FROM {table_name}
                 f"{column} = '{value}'"
             )
 
-    # Comparison filters
+    # -----------------------------
+    # Business comparison filters
+    # -----------------------------
     if comparison:
 
         values = ", ".join(
@@ -126,7 +130,23 @@ FROM {table_name}
             f"{comparison['dimension']} IN ({values})"
         )
 
+    # -----------------------------
+    # Quarter comparison filters
+    # -----------------------------
+    if quarter_comparison:
+
+        values = ", ".join(
+            str(value)
+            for value in quarter_comparison["values"]
+        )
+
+        conditions.append(
+            f"QUARTER IN ({values})"
+        )
+
+    # -----------------------------
     # Time comparison filters
+    # -----------------------------
     if time_comparison:
 
         years = ", ".join(
