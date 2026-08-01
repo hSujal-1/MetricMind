@@ -9,45 +9,21 @@ import re
 
 from app.services.snowflake_service import get_distinct_values
 
-FILTER_VALUES = {
-    "STATE": {
-        "California": [
-            "California",
-            "CA"
-        ],
-        "Texas": [
-            "Texas",
-            "TX"
-        ],
-        "New York": [
-            "New York",
-            "NY"
-        ],
-        "Florida": [
-            "Florida",
-            "FL"
-        ]
-    },
+TABLE_NAME = "GLOBAL_SUPERSTORE"
 
-    "CATEGORY": {
-        "Furniture": [
-            "Furniture"
-        ],
-        "Technology": [
-            "Technology",
-            "Tech"
-        ],
-        "Office Supplies": [
-            "Office Supplies",
-            "Office"
-        ]
-    }
-}
+FILTER_COLUMNS = [
+    "STATE",
+    "CATEGORY",
+    "REGION",
+    "SEGMENT",
+    "CITY"
+]
 
 
 def detect_filters(question: str):
     """
-    Detect filters from user question.
+    Detect business filters dynamically
+    from Snowflake.
 
     Returns:
         dict
@@ -57,16 +33,20 @@ def detect_filters(question: str):
 
     filters = {}
 
-    for column, values in FILTER_VALUES.items():
+    for column in FILTER_COLUMNS:
 
-        for actual_value, aliases in values.items():
+        values = get_distinct_values(
+            TABLE_NAME,
+            column
+        )
 
-            for alias in aliases:
+        for value in values:
 
-                pattern = rf"\b{re.escape(alias.lower())}\b"
+            pattern = rf"\b{re.escape(value.lower())}\b"
 
-                if re.search(pattern, question):
-                    filters[column] = actual_value
-                    break
+            if re.search(pattern, question):
+
+                filters[column] = value
+                break
 
     return filters

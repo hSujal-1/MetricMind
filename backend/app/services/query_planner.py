@@ -84,12 +84,16 @@ def build_query_plan(question: str):
     # ----------------------------------
 
     if superlative and matched_metrics:
+
         order_by = {
             "column": matched_metrics[0]["metric_name"],
             "direction": superlative["direction"]
         }
 
-        limit = superlative["limit"]
+        # Only apply LIMIT 1 when the user
+        # did not explicitly ask for another limit
+        if limit is None:
+            limit = superlative["limit"]
 
     metric_names = []
 
