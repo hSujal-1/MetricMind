@@ -13,6 +13,7 @@ from app.services.date_range_service import detect_date_range
 from app.services.relative_time_service import detect_relative_time
 from app.services.quarter_service import detect_quarter
 from app.services.quarter_comparison_service import detect_quarter_comparison
+from app.services.superlative_service import detect_superlative
 
 
 def build_query_plan(question: str):
@@ -46,6 +47,7 @@ def build_query_plan(question: str):
     group_by = detect_group_by(question)
     order_by = detect_order_by(question, matched_metrics)
     limit = detect_limit(question)
+    superlative = detect_superlative(question)
 
     comparison = detect_comparison(question)
     quarter_comparison = detect_quarter_comparison(question)
@@ -77,6 +79,17 @@ def build_query_plan(question: str):
     # Automatically GROUP BY QUARTER
     if quarter_comparison and not group_by:
         group_by = ["QUARTER"]
+    # ----------------------------------
+    # Superlative detection
+    # ----------------------------------
+
+    if superlative and matched_metrics:
+        order_by = {
+            "column": matched_metrics[0]["metric_name"],
+            "direction": superlative["direction"]
+        }
+
+        limit = superlative["limit"]
 
     metric_names = []
 
