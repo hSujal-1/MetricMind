@@ -14,6 +14,7 @@ from app.services.relative_time_service import detect_relative_time
 from app.services.quarter_service import detect_quarter
 from app.services.quarter_comparison_service import detect_quarter_comparison
 from app.services.superlative_service import detect_superlative
+from app.services.synonym_service import normalize_question
 
 
 def build_query_plan(question: str):
@@ -21,8 +22,17 @@ def build_query_plan(question: str):
     Build a semantic query plan from
     a natural language question.
     """
+    # Normalize business synonyms
+    question = normalize_question(question)
 
     matched_metrics = detect_metrics(question)
+    # Default to Total Sales when no metric is detected
+    if not matched_metrics:
+        matched_metrics = [
+            {
+                "metric_name": "total_sales"
+            }
+        ]
 
     # Detect filters
     filters = detect_filters(question)
