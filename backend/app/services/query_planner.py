@@ -15,6 +15,7 @@ from app.services.quarter_service import detect_quarter
 from app.services.quarter_comparison_service import detect_quarter_comparison
 from app.services.superlative_service import detect_superlative
 from app.services.synonym_service import normalize_question
+from app.services.intent_service import is_business_question
 
 
 def build_query_plan(question: str):
@@ -27,7 +28,7 @@ def build_query_plan(question: str):
 
     matched_metrics = detect_metrics(question)
     # Default to Total Sales when no metric is detected
-    if not matched_metrics:
+    if not matched_metrics and is_business_question(question):
         matched_metrics = [
             {
                 "metric_name": "total_sales"

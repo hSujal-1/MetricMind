@@ -125,41 +125,36 @@ def ask_question(payload: dict = Body(...)):
     and returns the business answer.
     """
 
-    question = payload.get("question", "")
+    question = payload.get("question", "").strip()
+
+    # Validate empty question
+    if not question:
+        return {
+            "status": "Failed",
+            "error": "Please enter a question."
+        }
 
     # Build semantic query plan
     plan = build_query_plan(question)
 
-    # Execute the plan
+    # Validate metric detection
+    if not plan.get("metrics"):
+        return {
+            "status": "Failed",
+            "error": "Unable to identify a business metric from your question."
+        }
+
+    # Execute semantic query
     result = execute_query_plan(plan)
 
     if result.get("status") == "Failed":
         return result
 
     return {
+        "status": "Success",
         "question": question,
         "query_plan": plan,
-        **result
-    }
-
-    # Detect filters
-    filters = detect_filters(question)
-
-    # Generate SQL
-    sql = generate_sql(metric_name, filters)
-
-    # Execute SQL
-    result = execute_query(sql)
-
-    if result["status"] == "Failed":
-        return result
-
-    return {
-        "question": question,
-        "metric": metric["display_name"],
-        "filters": filters,
-        "sql": sql,
-        "value": result["result"]
+        "data": result
     }
 
 @router.post("/ask-multi")
