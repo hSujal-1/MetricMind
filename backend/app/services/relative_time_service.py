@@ -1,6 +1,6 @@
 import re
 
-from app.services.snowflake_service import get_latest_year
+from app.services.metadata_cache import get_cached_latest_year
 
 
 def detect_relative_time(question: str):
@@ -19,7 +19,7 @@ def detect_relative_time(question: str):
 
     question = question.lower()
 
-    latest_year = get_latest_year()
+    latest_year = get_cached_latest_year()
 
     current_patterns = [
         r"\bthis\s+year\b",

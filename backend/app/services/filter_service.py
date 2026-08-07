@@ -7,7 +7,7 @@ from natural language questions.
 
 import re
 
-from app.services.snowflake_service import get_distinct_values
+from app.services.metadata_cache import get_cached_values
 
 TABLE_NAME = "GLOBAL_SUPERSTORE"
 
@@ -35,10 +35,7 @@ def detect_filters(question: str):
 
     for column in FILTER_COLUMNS:
 
-        values = get_distinct_values(
-            TABLE_NAME,
-            column
-        )
+        values = get_cached_values(column)
 
         for value in values:
 
