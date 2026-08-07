@@ -23,6 +23,7 @@ from app.services.nlp_service import (
 from app.services.filter_service import detect_filters
 from app.services.query_planner import build_query_plan
 from app.services.execution_engine import execute_query_plan
+from app.models.response_models import APIResponse
 
 router = APIRouter(
     prefix="/api",
@@ -118,7 +119,10 @@ def execute_metric(metric_name: str):
     }
 
 
-@router.post("/ask")
+@router.post(
+    "/ask",
+    response_model=APIResponse
+)
 def ask_question(payload: dict = Body(...)):
     """
     Accepts a natural language question
@@ -151,10 +155,19 @@ def ask_question(payload: dict = Body(...)):
         return result
 
     return {
-        "status": "Success",
+        "success": True,
+
+        "type": result.get("query_type"),
+
         "question": question,
+
         "query_plan": plan,
-        "data": result
+
+        "sql": result.get("sql"),
+
+        "data": result,
+
+        "message": None
     }
 
 @router.post("/ask-multi")

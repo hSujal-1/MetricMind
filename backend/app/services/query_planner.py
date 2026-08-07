@@ -1,5 +1,3 @@
-import time
-
 from app.services.nlp_service import detect_metrics
 from app.services.filter_service import detect_filters
 from app.services.time_filter_service import (
@@ -26,137 +24,85 @@ def build_query_plan(question: str):
     a natural language question.
     """
 
-    total_start = time.time()
-
-    # ----------------------------
-    # Normalize
-    # ----------------------------
-    t = time.time()
+    # Normalize business synonyms
     question = normalize_question(question)
-    print(f"normalize_question: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Metrics
-    # ----------------------------
-    t = time.time()
     matched_metrics = detect_metrics(question)
-    print(f"detect_metrics: {time.time() - t:.3f} sec")
 
-    if not matched_metrics:
-        t = time.time()
-        business_question = is_business_question(question)
-        print(f"is_business_question: {time.time() - t:.3f} sec")
+    # Default to Total Sales when no metric is detected
+    if not matched_metrics and is_business_question(question):
+        matched_metrics = [
+            {
+                "metric_name": "total_sales"
+            }
+        ]
 
-        if business_question:
-            matched_metrics = [
-                {
-                    "metric_name": "total_sales"
-                }
-            ]
-
-    # ----------------------------
-    # Filters
-    # ----------------------------
-    t = time.time()
+    # Detect filters
     filters = detect_filters(question)
-    print(f"detect_filters: {time.time() - t:.3f} sec")
 
-    t = time.time()
     date_range = detect_date_range(question)
-    print(f"detect_date_range: {time.time() - t:.3f} sec")
 
-    t = time.time()
     relative_time = detect_relative_time(question)
-    print(f"detect_relative_time: {time.time() - t:.3f} sec")
 
-    t = time.time()
     time_filters = detect_time_filters(question)
-    print(f"detect_time_filters: {time.time() - t:.3f} sec")
 
-    t = time.time()
     quarter_filters = detect_quarter(question)
-    print(f"detect_quarter: {time.time() - t:.3f} sec")
 
+    # Relative time has priority over explicit year detection
     if relative_time:
         filters.update(relative_time)
 
     elif not date_range:
         filters.update(time_filters)
 
+    # Quarter filters
     filters.update(quarter_filters)
 
-    # ----------------------------
-    # Grouping
-    # ----------------------------
-    t = time.time()
     group_by = detect_group_by(question)
-    print(f"detect_group_by: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Ordering
-    # ----------------------------
-    t = time.time()
     order_by = detect_order_by(question, matched_metrics)
-    print(f"detect_order_by: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Limit
-    # ----------------------------
-    t = time.time()
     limit = detect_limit(question)
-    print(f"detect_limit: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Superlative
-    # ----------------------------
-    t = time.time()
     superlative = detect_superlative(question)
-    print(f"detect_superlative: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Comparison
-    # ----------------------------
-    t = time.time()
     comparison = detect_comparison(question)
-    print(f"detect_comparison: {time.time() - t:.3f} sec")
 
-    t = time.time()
     quarter_comparison = detect_quarter_comparison(question)
-    print(f"detect_quarter_comparison: {time.time() - t:.3f} sec")
 
-    t = time.time()
     time_comparison = detect_time_comparison(question)
-    print(f"detect_time_comparison: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Having
-    # ----------------------------
-    t = time.time()
     having = detect_having(question)
-    print(f"detect_having: {time.time() - t:.3f} sec")
 
-    # ----------------------------
-    # Existing Logic
-    # ----------------------------
-
+    # A date range takes precedence over year-over-year comparison
     if date_range:
         time_comparison = None
 
+    # If it's a comparison query, don't use normal filters
     if comparison:
         filters = {}
 
+    # If it's a quarter comparison query,
+    # remove the normal QUARTER filter
     if quarter_comparison:
         filters.pop("QUARTER", None)
 
+    # If it's a time comparison query,
+    # don't use single YEAR filter
     if time_comparison:
         filters = {}
 
+    # Automatically GROUP BY comparison dimension
     if comparison and not group_by:
         group_by = [comparison["dimension"]]
 
+    # Automatically GROUP BY QUARTER
     if quarter_comparison and not group_by:
         group_by = ["QUARTER"]
 
+    # ----------------------------------
+    # Superlative detection
+    # ----------------------------------
     if superlative and matched_metrics:
 
         order_by = {
@@ -164,6 +110,8 @@ def build_query_plan(question: str):
             "direction": superlative["direction"]
         }
 
+        # Only apply LIMIT 1 when the user
+        # did not explicitly ask for another limit
         if limit is None:
             limit = superlative["limit"]
 
@@ -172,10 +120,6 @@ def build_query_plan(question: str):
     for item in matched_metrics:
         metric_names.append(item["metric_name"])
 
-    print("=" * 60)
-    print(f"TOTAL Query Planner Time: {time.time() - total_start:.3f} sec")
-    print("=" * 60)
-
     return {
         "question": question,
         "metrics": metric_names,
@@ -183,9 +127,19 @@ def build_query_plan(question: str):
         "group_by": group_by,
         "order_by": order_by,
         "limit": limit,
+
+        # Semantic comparison
         "comparison": comparison,
+
+        # Quarter comparison
         "quarter_comparison": quarter_comparison,
+
+        # Time comparison (Year-over-Year)
         "time_comparison": time_comparison,
+
+        # Date range
         "date_range": date_range,
+
+        # Aggregate filtering
         "having": having
     }
