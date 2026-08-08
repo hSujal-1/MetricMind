@@ -1,4 +1,4 @@
-from app.services.nlp_service import detect_metrics
+from app.services.nlp_service import detect_metric
 from app.services.filter_service import detect_filters
 from app.services.time_filter_service import (
     detect_time_filters,
@@ -15,7 +15,6 @@ from app.services.quarter_service import detect_quarter
 from app.services.quarter_comparison_service import detect_quarter_comparison
 from app.services.superlative_service import detect_superlative
 from app.services.synonym_service import normalize_question
-from app.services.intent_service import is_business_question
 
 
 def build_query_plan(question: str):
@@ -27,13 +26,16 @@ def build_query_plan(question: str):
     # Normalize business synonyms
     question = normalize_question(question)
 
-    matched_metrics = detect_metrics(question)
+    metric_name, metric = detect_metric(question)
 
-    # Default to Total Sales when no metric is detected
-    if not matched_metrics and is_business_question(question):
+    matched_metrics = []
+
+    if metric_name:
         matched_metrics = [
             {
-                "metric_name": "total_sales"
+                "metric_name": metric_name,
+                "metric": metric,
+                "score": 1
             }
         ]
 
@@ -60,11 +62,28 @@ def build_query_plan(question: str):
 
     group_by = detect_group_by(question)
 
-    order_by = detect_order_by(question, matched_metrics)
-
     limit = detect_limit(question)
 
     superlative = detect_superlative(question)
+
+    # ----------------------------------
+    # Default metric for ranking queries
+    # ----------------------------------
+    # If the user asks for the strongest/best/highest
+    # region, city, category, etc. without explicitly
+    # mentioning a metric, default to Total Sales.
+    if (
+            not matched_metrics
+            and group_by
+            and superlative
+    ):
+        matched_metrics = [
+            {
+                "metric_name": "total_sales"
+            }
+        ]
+
+    order_by = detect_order_by(question, matched_metrics)
 
     comparison = detect_comparison(question)
 

@@ -1,139 +1,176 @@
 "use client";
 
 import { useState } from "react";
-import { askMetricMind } from "../services/api";
-import KPICard from "@/components/KPICard";
+
+import Navbar from "@/components/layout/Navbar";
+import Hero from "@/components/layout/Hero";
+import ChatBox from "@/components/chat/ChatBox";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import ResponseRenderer from "@/components/ResponseRenderer";
 
 export default function Home() {
-
-  const [question, setQuestion] = useState("");
-
   const [response, setResponse] = useState<any>(null);
-
   const [loading, setLoading] = useState(false);
 
-  const handleAsk = async () => {
-
-    if (!question.trim()) return;
-
-    setLoading(true);
-
-    try {
-
-      const result = await askMetricMind(question);
-
-      setResponse(result);
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert("Unable to connect to backend.");
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  };
-
   return (
-
     <main className="min-h-screen bg-slate-950 text-white">
 
       {/* Navbar */}
-      <nav className="border-b border-slate-800">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-
-          <h1 className="text-2xl font-bold">
-            Metric<span className="text-cyan-400">Mind</span>
-          </h1>
-
-          <div className="flex items-center gap-6 text-sm text-slate-400">
-
-            <button className="hover:text-white transition">
-              Documentation
-            </button>
-
-            <button className="hover:text-white transition">
-              GitHub
-            </button>
-
-          </div>
-
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero */}
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <Hero />
 
-        <h2 className="text-center text-5xl font-bold">
-          Ask Your Business Anything
-        </h2>
-
-        <p className="mx-auto mt-5 max-w-3xl text-center text-lg text-slate-400">
-          Transform natural language into accurate business insights
-          using Semantic AI, FastAPI, and Snowflake.
-        </p>
-
-      </section>
-
-      {/* Chat Box */}
-      <section className="mx-auto max-w-4xl px-6">
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
-
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a business question..."
-            className="h-36 w-full resize-none rounded-xl bg-slate-950 p-4 outline-none"
-          />
-
-          <div className="mt-5 flex justify-end">
-
-            <button
-              onClick={handleAsk}
-              disabled={loading}
-              className="rounded-xl bg-cyan-500 px-6 py-3 font-semibold text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
-            >
-              {loading ? "Thinking..." : "Ask MetricMind"}
-            </button>
-
-          </div>
-
-        </div>
-
-      </section>
+      {/* Chat */}
+      <ChatBox
+        onResponse={(result) => {
+          setResponse(result);
+        }}
+        onLoadingChange={(isLoading) => {
+          setLoading(isLoading);
+        }}
+      />
 
       {/* Response Area */}
       <section className="mx-auto mt-12 max-w-6xl px-6 pb-16">
 
-        <div className="rounded-2xl border border-dashed border-slate-700 p-8">
+        <div
+          className="
+            rounded-3xl
+            border
+            border-white/10
+            bg-slate-900/60
+            p-8
+            backdrop-blur-xl
+            shadow-[0_0_40px_rgba(139,92,246,0.10)]
+          "
+        >
 
-          {response ? (
+          {/* Response Header */}
+          <div className="mb-6">
 
-            response.data?.query_type === "kpi" ? (
+            <h3 className="text-xl font-semibold text-white">
+              ✨ AI Response
+            </h3>
 
-              <KPICard
-                title={response.data.metrics[0]}
-                value={Object.values(response.data.values)[0] as string | number}
-              />
+            <p className="mt-1 text-sm text-slate-400">
+              Generated from your business question
+            </p>
 
-            ) : (
+          </div>
 
-              <pre className="overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-6 text-left text-sm text-green-400">
-                {JSON.stringify(response, null, 2)}
-              </pre>
+          {/* Loading */}
+          {loading ? (
 
-            )
+            <LoadingSpinner />
+
+          ) : response ? (
+
+            /*
+             * All response-format logic is handled
+             * inside ResponseRenderer.
+             *
+             * Examples:
+             *
+             * KPI
+             * → Total Sales
+             *
+             * Single-row result
+             * → Best City
+             *
+             * Multi-row result
+             * → Sales by Region
+             * → Chart + Detailed Data
+             */
+            <ResponseRenderer
+              response={response}
+            />
 
           ) : (
 
-            <p className="text-center text-slate-500">
-              Responses from MetricMind will appear here.
-            </p>
+            /* Empty State */
+            <div className="py-10 text-center">
+
+              <div
+                className="
+                  mx-auto
+                  mb-4
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-violet-500/20
+                  bg-violet-500/10
+                  text-2xl
+                  shadow-[0_0_30px_rgba(139,92,246,0.12)]
+                "
+              >
+                ✨
+              </div>
+
+              <p className="text-lg font-medium text-slate-300">
+                Ready to Analyze
+              </p>
+
+              <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+                Ask a business question and MetricMind
+                will transform it into an actionable insight.
+              </p>
+
+              {/* Example Questions */}
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+
+                <span
+                  className="
+                    rounded-full
+                    border
+                    border-white/10
+                    bg-slate-900
+                    px-4
+                    py-2
+                    text-xs
+                    text-slate-400
+                  "
+                >
+                  Total Sales
+                </span>
+
+                <span
+                  className="
+                    rounded-full
+                    border
+                    border-white/10
+                    bg-slate-900
+                    px-4
+                    py-2
+                    text-xs
+                    text-slate-400
+                  "
+                >
+                  Best City
+                </span>
+
+                <span
+                  className="
+                    rounded-full
+                    border
+                    border-white/10
+                    bg-slate-900
+                    px-4
+                    py-2
+                    text-xs
+                    text-slate-400
+                  "
+                >
+                  Profit by Category
+                </span>
+
+              </div>
+
+            </div>
 
           )}
 
@@ -142,7 +179,5 @@ export default function Home() {
       </section>
 
     </main>
-
   );
-
 }

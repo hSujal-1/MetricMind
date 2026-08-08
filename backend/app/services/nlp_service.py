@@ -3,11 +3,14 @@ from app.semantic.metrics import SEMANTIC_METRICS
 
 def detect_metric(question: str):
     """
-    Detects the best matching semantic metric
-    using weighted display names and aliases.
+    Detect the best matching semantic metric.
+
+    Uses weighted aliases so that specific
+    phrases such as "average sales" take
+    priority over generic words such as "sales".
     """
 
-    question = question.lower()
+    question = question.lower().strip()
 
     best_metric_name = None
     best_metric = None
@@ -17,19 +20,34 @@ def detect_metric(question: str):
 
         score = 0
 
-        # Display name carries high weight
-        if metric["display_name"].lower() in question:
-            score += 5
+        display_name = metric["display_name"].lower()
 
+        # ----------------------------------
+        # Exact display name
+        # ----------------------------------
+
+        if display_name in question:
+            score += 10
+
+        # ----------------------------------
         # Weighted aliases
+        # ----------------------------------
+
         aliases = metric.get("aliases", {})
 
         for alias, weight in aliases.items():
-            if alias.lower() in question:
+
+            alias = alias.lower().strip()
+
+            if alias in question:
                 score += weight
 
-        # Keep the highest scoring metric
+        # ----------------------------------
+        # Keep strongest metric
+        # ----------------------------------
+
         if score > best_score:
+
             best_score = score
             best_metric_name = metric_name
             best_metric = metric
@@ -39,12 +57,15 @@ def detect_metric(question: str):
 
     return best_metric_name, best_metric
 
+
 def detect_metrics(question: str):
     """
     Detect all matching semantic metrics.
+
+    Used by endpoints such as /api/ask-multi.
     """
 
-    question = question.lower()
+    question = question.lower().strip()
 
     matched_metrics = []
 
@@ -52,16 +73,26 @@ def detect_metrics(question: str):
 
         score = 0
 
-        # Display name
-        if metric["display_name"].lower() in question:
-            score += 5
+        display_name = metric["display_name"].lower()
 
+        # ----------------------------------
+        # Display name
+        # ----------------------------------
+
+        if display_name in question:
+            score += 10
+
+        # ----------------------------------
         # Weighted aliases
+        # ----------------------------------
+
         aliases = metric.get("aliases", {})
 
         for alias, weight in aliases.items():
 
-            if alias.lower() in question:
+            alias = alias.lower().strip()
+
+            if alias in question:
                 score += weight
 
         if score > 0:

@@ -21,6 +21,7 @@ BUSINESS_SYNONYMS = {
 
     # Ranking
     "best": "highest",
+    "strongest": "highest",
     "worst": "lowest",
     "maximum": "highest",
     "minimum": "lowest",

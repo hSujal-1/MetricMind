@@ -3,7 +3,7 @@ from typing import Any
 
 
 class APIResponse(BaseModel):
-    success: bool
+    success: bool = False
 
     type: str | None = None
 
@@ -16,3 +16,7 @@ class APIResponse(BaseModel):
     data: Any = None
 
     message: str | None = None
+
+    error: str | None = None
+
+    status: str | None = None
