@@ -61,6 +61,50 @@ function formatMetricName(column: string): string {
 }
 
 // ============================================================
+// GET SINGLE METRIC DISPLAY NAME
+// ============================================================
+//
+// Examples:
+//
+// TOTAL_SALES     -> Sales
+// TOTAL_PROFIT    -> Profit
+// TOTAL_QUANTITY  -> Quantity
+//
+// This prevents the visualization from always saying "Sales"
+// when the user actually asks for profit or quantity.
+// ============================================================
+
+function getSingleMetricName(metricKey: string): string {
+  const normalized = metricKey
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .trim();
+
+  if (
+    normalized === "total sales" ||
+    normalized === "sales"
+  ) {
+    return "Sales";
+  }
+
+  if (
+    normalized === "total profit" ||
+    normalized === "profit"
+  ) {
+    return "Profit";
+  }
+
+  if (
+    normalized === "total quantity" ||
+    normalized === "quantity"
+  ) {
+    return "Quantity";
+  }
+
+  return formatMetricName(metricKey);
+}
+
+// ============================================================
 // CUSTOM MULTI-METRIC TOOLTIP
 // ============================================================
 
@@ -500,6 +544,22 @@ export default function VisualizationEngine({
     metricKeys.length > 1;
 
   // ==========================================================
+  // SINGLE METRIC NAME
+  // ==========================================================
+  //
+  // IMPORTANT:
+  //
+  // TOTAL_SALES    -> Sales
+  // TOTAL_PROFIT   -> Profit
+  // TOTAL_QUANTITY -> Quantity
+  //
+  // This is the main fix for the current issue.
+  // ==========================================================
+
+  const singleMetricName =
+    getSingleMetricName(yKey);
+
+  // ==========================================================
   // QUESTION ANALYSIS
   // ==========================================================
 
@@ -726,6 +786,7 @@ export default function VisualizationEngine({
   // ----------------------------------------------------------
 
   if (hasMultipleMetrics) {
+
     title = metricKeys
       .map(formatMetricName)
       .join(" & ");
@@ -744,7 +805,7 @@ export default function VisualizationEngine({
           ? `${metricKeys
               .map(formatMetricName)
               .join(" & ")} Trend by Month`
-          : "Sales Trend by Month";
+          : `${singleMetricName} Trend by Month`;
 
     } else if (isQuarter) {
 
@@ -753,7 +814,7 @@ export default function VisualizationEngine({
           ? `${metricKeys
               .map(formatMetricName)
               .join(" & ")} Trend by Quarter`
-          : "Sales Trend by Quarter";
+          : `${singleMetricName} Trend by Quarter`;
 
     } else if (isYear) {
 
@@ -762,7 +823,7 @@ export default function VisualizationEngine({
           ? `${metricKeys
               .map(formatMetricName)
               .join(" & ")} Trend by Year`
-          : "Sales Trend by Year";
+          : `${singleMetricName} Trend by Year`;
 
     } else if (isDate) {
 
@@ -771,7 +832,7 @@ export default function VisualizationEngine({
           ? `${metricKeys
               .map(formatMetricName)
               .join(" & ")} Over Time`
-          : "Sales Trend Over Time";
+          : `${singleMetricName} Over Time`;
 
     } else {
 
@@ -780,7 +841,7 @@ export default function VisualizationEngine({
           ? `${metricKeys
               .map(formatMetricName)
               .join(" & ")} Trend`
-          : "Sales Trend Over Time";
+          : `${singleMetricName} Trend Over Time`;
     }
 
   // ----------------------------------------------------------
@@ -804,7 +865,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by City`
-        : "Sales by City";
+        : `${singleMetricName} by City`;
 
   } else if (isState) {
 
@@ -813,7 +874,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by State`
-        : "Sales by State";
+        : `${singleMetricName} by State`;
 
   } else if (isSubCategory) {
 
@@ -822,7 +883,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Sub-Category`
-        : "Sales by Sub-Category";
+        : `${singleMetricName} by Sub-Category`;
 
   } else if (isCategory) {
 
@@ -831,7 +892,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Category`
-        : "Sales by Category";
+        : `${singleMetricName} by Category`;
 
   } else if (isRegion) {
 
@@ -840,7 +901,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Region`
-        : "Sales by Region";
+        : `${singleMetricName} by Region`;
 
   } else if (isSegment) {
 
@@ -849,7 +910,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Segment`
-        : "Sales by Segment";
+        : `${singleMetricName} by Segment`;
 
   } else if (isCountry) {
 
@@ -858,7 +919,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Country`
-        : "Sales by Country";
+        : `${singleMetricName} by Country`;
 
   } else if (isMarket) {
 
@@ -867,7 +928,7 @@ export default function VisualizationEngine({
         ? `${metricKeys
             .map(formatMetricName)
             .join(" & ")} by Market`
-        : "Sales by Market";
+        : `${singleMetricName} by Market`;
   }
 
   // ==========================================================
@@ -877,7 +938,7 @@ export default function VisualizationEngine({
   let description =
     hasMultipleMetrics
       ? "Comparison of multiple business metrics across the selected dimension."
-      : "Comparison of business performance across categories.";
+      : `Comparison of ${singleMetricName.toLowerCase()} across the selected dimension.`;
 
   // ----------------------------------------------------------
   // Time-series description
@@ -890,86 +951,100 @@ export default function VisualizationEngine({
       description =
         hasMultipleMetrics
           ? "Monthly comparison of multiple business metrics over time."
-          : "Monthly sales performance showing the movement of sales over time.";
+          : `Monthly ${singleMetricName.toLowerCase()} performance showing the movement of ${singleMetricName.toLowerCase()} over time.`;
 
     } else if (isQuarter) {
 
       description =
         hasMultipleMetrics
           ? "Quarterly comparison of multiple business metrics."
-          : "Quarterly sales performance showing changes across business periods.";
+          : `Quarterly ${singleMetricName.toLowerCase()} performance showing changes across business periods.`;
 
     } else if (isYear) {
 
       description =
         hasMultipleMetrics
           ? "Yearly comparison of multiple business metrics."
-          : "Yearly sales performance showing the long-term business trend.";
+          : `Yearly ${singleMetricName.toLowerCase()} performance showing the long-term business trend.`;
 
     } else if (isDate) {
 
       description =
         hasMultipleMetrics
           ? "Comparison of multiple business metrics across the selected dates."
-          : "Sales performance across the selected dates.";
+          : `${singleMetricName} performance across the selected dates.`;
 
     } else {
 
       description =
-        "Business performance trend across the selected time period.";
+        `${singleMetricName} performance trend across the selected time period.`;
     }
 
   } else if (isTopQuestion) {
 
     description =
-      "Highest-performing results based on the selected business metric.";
+      `Highest-performing results based on ${singleMetricName.toLowerCase()}.`;
 
   } else if (isBottomQuestion) {
 
     description =
-      "Lowest-performing results based on the selected business metric.";
+      `Lowest-performing results based on ${singleMetricName.toLowerCase()}.`;
 
   } else if (isCity) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of multiple metrics across cities."
-        : "Top cities ranked by business performance.";
+        : `${singleMetricName} performance across cities.`;
 
   } else if (isState) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of multiple metrics across states."
-        : "States ranked by business performance.";
+        : `${singleMetricName} performance across states.`;
 
   } else if (isSubCategory) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of multiple metrics across sub-categories."
-        : "Sub-categories ranked by business performance.";
+        : `${singleMetricName} performance across sub-categories.`;
 
   } else if (isCategory) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of sales and profit across product categories."
-        : "Comparison of business performance across product categories.";
+        : `Comparison of ${singleMetricName.toLowerCase()} across product categories.`;
 
   } else if (isRegion) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of multiple metrics across regions."
-        : "Comparison of business performance across regions.";
+        : `Comparison of ${singleMetricName.toLowerCase()} across regions.`;
 
   } else if (isSegment) {
 
     description =
       hasMultipleMetrics
         ? "Comparison of multiple metrics across customer segments."
-        : "Comparison of business performance across customer segments.";
+        : `Comparison of ${singleMetricName.toLowerCase()} across customer segments.`;
+
+  } else if (isCountry) {
+
+    description =
+      hasMultipleMetrics
+        ? "Comparison of multiple metrics across countries."
+        : `Comparison of ${singleMetricName.toLowerCase()} across countries.`;
+
+  } else if (isMarket) {
+
+    description =
+      hasMultipleMetrics
+        ? "Comparison of multiple metrics across markets."
+        : `Comparison of ${singleMetricName.toLowerCase()} across markets.`;
   }
 
   // ==========================================================

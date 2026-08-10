@@ -9,33 +9,163 @@ type ResponseRendererProps = {
   response: any;
 };
 
+// =========================================================
+// HELPERS
+// =========================================================
+
+function formatMetricName(metric: string): string {
+  return metric
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function isNumericValue(value: any): boolean {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value)
+  );
+}
+
+function getMetricColumns(
+  columns: string[],
+  groupBy: string[]
+): string[] {
+  return columns.filter(
+    (column) =>
+      !groupBy.includes(column) &&
+      column !== columns[0]
+  );
+}
+
+function detectRequestedMetric(
+  question: string,
+  metricColumns: string[]
+): string | null {
+  const q = question.toLowerCase();
+
+  // Profit has priority when explicitly requested.
+  if (
+    q.includes("profit") &&
+    metricColumns.some((column) =>
+      column.toLowerCase().includes("profit")
+    )
+  ) {
+    return (
+      metricColumns.find((column) =>
+        column.toLowerCase().includes("profit")
+      ) || null
+    );
+  }
+
+  // Quantity
+  if (
+    q.includes("quantity") &&
+    metricColumns.some((column) =>
+      column.toLowerCase().includes("quantity")
+    )
+  ) {
+    return (
+      metricColumns.find((column) =>
+        column.toLowerCase().includes("quantity")
+      ) || null
+    );
+  }
+
+  // Sales
+  if (
+    q.includes("sales") &&
+    metricColumns.some((column) =>
+      column.toLowerCase().includes("sales")
+    )
+  ) {
+    return (
+      metricColumns.find((column) =>
+        column.toLowerCase().includes("sales")
+      ) || null
+    );
+  }
+
+  // Revenue
+  if (
+    q.includes("revenue") &&
+    metricColumns.some((column) =>
+      column.toLowerCase().includes("revenue")
+    )
+  ) {
+    return (
+      metricColumns.find((column) =>
+        column.toLowerCase().includes("revenue")
+      ) || null
+    );
+  }
+
+  // Default to first metric.
+  return metricColumns[0] || null;
+}
+
+function findBestRow(
+  rows: any[],
+  metricColumn: string,
+  direction: "highest" | "lowest"
+): any | null {
+  if (!rows.length || !metricColumn) {
+    return null;
+  }
+
+  const validRows = rows.filter((row) =>
+    isNumericValue(row?.[metricColumn])
+  );
+
+  if (!validRows.length) {
+    return null;
+  }
+
+  return validRows.reduce(
+    (best, current) => {
+      const bestValue = Number(
+        best[metricColumn]
+      );
+
+      const currentValue = Number(
+        current[metricColumn]
+      );
+
+      if (direction === "highest") {
+        return currentValue > bestValue
+          ? current
+          : best;
+      }
+
+      return currentValue < bestValue
+        ? current
+        : best;
+    }
+  );
+}
+
+// =========================================================
+// COMPONENT
+// =========================================================
+
 export default function ResponseRenderer({
   response,
 }: ResponseRendererProps) {
 
-  // =========================================================
+  // =======================================================
   // SAFETY CHECK
-  // =========================================================
+  // =======================================================
 
   if (!response) {
     return null;
   }
 
-  // =========================================================
+  // =======================================================
   // FAILED RESPONSE
-  // =========================================================
+  // =======================================================
 
   if (response.success === false) {
     return (
-      <div
-        className="
-          rounded-2xl
-          border
-          border-red-500/20
-          bg-red-950/20
-          p-6
-        "
-      >
+      <div className="rounded-2xl border border-red-400/20 bg-red-950/20 p-6">
         <p className="text-sm font-semibold text-red-300">
           Unable to process your question
         </p>
@@ -51,18 +181,55 @@ export default function ResponseRenderer({
 
   const data = response.data;
 
-  // =========================================================
+  // =======================================================
   // KPI RESPONSE
-  // =========================================================
+  // =======================================================
 
   if (response.type === "kpi") {
 
-    const metric = data?.metrics?.[0];
+    const metrics: string[] =
+      data?.metrics || [];
+
+    const values =
+      data?.values || {};
+
+    // -----------------------------------------------------
+    // Multiple KPI metrics
+    // -----------------------------------------------------
+
+    if (metrics.length > 1) {
+      return (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {metrics.map((metric: string) => {
+
+            const value =
+              values[metric];
+
+            return (
+              <KPICard
+                key={metric}
+                title={metric}
+                value={
+                  value as string | number
+                }
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    // -----------------------------------------------------
+    // Single KPI
+    // -----------------------------------------------------
+
+    const metric =
+      metrics[0];
 
     const value =
-      data?.values
-        ? Object.values(data.values)[0]
-        : null;
+      metric
+        ? values[metric]
+        : Object.values(values)[0];
 
     if (
       metric &&
@@ -71,20 +238,20 @@ export default function ResponseRenderer({
     ) {
       return (
         <div className="flex justify-center">
-
           <KPICard
             title={metric}
-            value={value as string | number}
+            value={
+              value as string | number
+            }
           />
-
         </div>
       );
     }
   }
 
-  // =========================================================
+  // =======================================================
   // TABLE / GROUPED RESPONSE
-  // =========================================================
+  // =======================================================
 
   if (response.type === "table") {
 
@@ -94,9 +261,9 @@ export default function ResponseRenderer({
     const rows: any[] =
       data?.rows || [];
 
-    // -------------------------------------------------------
+    // -----------------------------------------------------
     // Empty result
-    // -------------------------------------------------------
+    // -----------------------------------------------------
 
     if (
       !columns.length ||
@@ -104,23 +271,20 @@ export default function ResponseRenderer({
     ) {
       return (
         <div className="py-10 text-center">
-
           <p className="text-slate-400">
             No data found for this question.
           </p>
-
         </div>
       );
     }
 
-    // -------------------------------------------------------
+    // -----------------------------------------------------
     // Normalize backend rows
-    // -------------------------------------------------------
+    // -----------------------------------------------------
 
     const normalizedRows =
       rows.map((row: any) => {
 
-        // Backend already returned object
         if (
           row &&
           !Array.isArray(row)
@@ -128,8 +292,10 @@ export default function ResponseRenderer({
           return row;
         }
 
-        // Backend returned array
-        const converted: Record<string, any> = {};
+        const converted: Record<
+          string,
+          any
+        > = {};
 
         columns.forEach(
           (
@@ -144,42 +310,51 @@ export default function ResponseRenderer({
         return converted;
       });
 
-    // -------------------------------------------------------
+    // -----------------------------------------------------
     // Group information
-    // -------------------------------------------------------
+    // -----------------------------------------------------
 
-    const groupBy =
+    const groupBy: string[] =
       data?.group_by || [];
 
-    // -------------------------------------------------------
-    // First result
-    // -------------------------------------------------------
-
-    const firstRow =
-      normalizedRows[0];
-
-    const entityKey =
-      columns[0];
-
-    const metricKey =
-      columns[1];
-
-    const entityValue =
-      firstRow?.[entityKey];
-
-    const metricValue =
-      firstRow?.[metricKey];
-
-    // -------------------------------------------------------
+    // -----------------------------------------------------
     // User question
-    // -------------------------------------------------------
+    // -----------------------------------------------------
 
     const question =
-      response.question?.toLowerCase() || "";
+      response.question?.toLowerCase() ||
+      "";
 
-    // -------------------------------------------------------
+    // -----------------------------------------------------
+    // Query plan
+    // -----------------------------------------------------
+
+    const queryPlan =
+      response.query_plan || {};
+
+    // -----------------------------------------------------
+    // Metric columns
+    // -----------------------------------------------------
+
+    const metricColumns =
+      getMetricColumns(
+        columns,
+        groupBy
+      );
+
+    // -----------------------------------------------------
+    // Detect requested metric
+    // -----------------------------------------------------
+
+    const requestedMetric =
+      detectRequestedMetric(
+        question,
+        metricColumns
+      );
+
+    // -----------------------------------------------------
     // Ranking question detection
-    // -------------------------------------------------------
+    // -----------------------------------------------------
 
     const isRankingQuestion =
       question.includes("highest") ||
@@ -189,22 +364,65 @@ export default function ResponseRenderer({
       question.includes("best") ||
       question.includes("worst");
 
-    // -------------------------------------------------------
-    // Query plan
-    // -------------------------------------------------------
+    // -----------------------------------------------------
+    // Ranking direction
+    // -----------------------------------------------------
 
-    const queryPlan =
-      response.query_plan || {};
+    const isLowest =
+      question.includes("lowest") ||
+      question.includes("bottom") ||
+      question.includes("worst");
+
+    const rankingDirection =
+      isLowest
+        ? "lowest"
+        : "highest";
+
+    // -----------------------------------------------------
+    // Query limit
+    // -----------------------------------------------------
 
     const isLimitedQuery =
-      queryPlan?.limit === 1;
+      queryPlan?.limit !== null &&
+      queryPlan?.limit !== undefined;
 
-    // -------------------------------------------------------
-    // Single result ranking
+    // =====================================================
+    // 3.2F — SMART BUSINESS INSIGHT
+    // =====================================================
+
+    const insightMetric =
+      requestedMetric ||
+      metricColumns[0];
+
+    const insightRow =
+      insightMetric
+        ? findBestRow(
+            normalizedRows,
+            insightMetric,
+            rankingDirection
+          )
+        : null;
+
+    // -----------------------------------------------------
+    // Entity column
+    // -----------------------------------------------------
+
+    const entityColumn =
+      groupBy[0] ||
+      columns[0];
+
+    const entityValue =
+      insightRow?.[entityColumn];
+
+    const insightMetricValue =
+      insightRow?.[insightMetric];
+
+    // =====================================================
+    // SINGLE RESULT RANKING
     //
     // Example:
     // "What is the highest-selling region?"
-    // -------------------------------------------------------
+    // =====================================================
 
     if (
       normalizedRows.length === 1 &&
@@ -213,11 +431,6 @@ export default function ResponseRenderer({
       isLimitedQuery &&
       entityValue !== undefined
     ) {
-
-      const isLowest =
-        question.includes("lowest") ||
-        question.includes("bottom") ||
-        question.includes("worst");
 
       const title =
         isLowest
@@ -231,25 +444,100 @@ export default function ResponseRenderer({
 
       return (
         <div className="mx-auto max-w-2xl">
-
           <InsightCard
             title={label}
             label={title}
             value={entityValue}
-            metric={metricKey.replaceAll(
-              "_",
-              " "
+            metric={formatMetricName(
+              insightMetric
             )}
-            metricValue={metricValue}
+            metricValue={
+              insightMetricValue
+            }
           />
-
         </div>
       );
     }
 
-    // =======================================================
+    // =====================================================
     // NORMAL BUSINESS ANALYSIS
-    // =======================================================
+    // =====================================================
+
+    const displayMetrics =
+      data?.metrics?.length
+        ? data.metrics
+        : metricColumns.map(
+            formatMetricName
+          );
+
+    const insightTitle =
+      displayMetrics.join(" & ") ||
+      "Business Analysis";
+
+    // -----------------------------------------------------
+    // Group label
+    // -----------------------------------------------------
+
+    const groupLabel =
+      groupBy.length
+        ? groupBy.join(", ")
+        : columns[0];
+
+    // -----------------------------------------------------
+    // Dynamic insight text
+    // -----------------------------------------------------
+
+    let insightDescription =
+      `Results grouped by ${groupLabel}`;
+
+    // -----------------------------------------------------
+    // If we have a valid leading entity,
+    // make the insight more meaningful.
+    // -----------------------------------------------------
+
+    if (
+      insightRow &&
+      entityValue !== undefined &&
+      insightMetric
+    ) {
+
+      const metricLabel =
+        formatMetricName(
+          insightMetric
+        );
+
+      const entityLabel =
+        String(entityValue);
+
+      const formattedValue =
+        isNumericValue(
+          insightMetricValue
+        )
+          ? Number(
+              insightMetricValue
+            ).toLocaleString("en-IN")
+          : String(
+              insightMetricValue ?? ""
+            );
+
+      if (
+        isRankingQuestion
+      ) {
+        insightDescription =
+          `${entityLabel} has the ${
+            isLowest
+              ? "lowest"
+              : "highest"
+          } ${metricLabel.toLowerCase()} at ${formattedValue}.`;
+      } else {
+        insightDescription =
+          `Results grouped by ${groupLabel}. ${entityLabel} leads in ${metricLabel.toLowerCase()} at ${formattedValue}.`;
+      }
+    }
+
+    // =====================================================
+    // BUSINESS INSIGHT
+    // =====================================================
 
     return (
       <div className="space-y-10">
@@ -279,8 +567,7 @@ export default function ResponseRenderer({
               text-white
             "
           >
-            {data.metrics?.join(" & ") ||
-              "Business Analysis"}
+            {insightTitle}
           </h3>
 
           <p
@@ -290,12 +577,7 @@ export default function ResponseRenderer({
               text-slate-400
             "
           >
-            Results grouped by{" "}
-
-            <span className="text-slate-200">
-              {groupBy.join(", ") ||
-                columns[0]}
-            </span>
+            {insightDescription}
           </p>
 
         </div>
@@ -351,20 +633,12 @@ export default function ResponseRenderer({
     );
   }
 
-  // =========================================================
+  // =======================================================
   // FALLBACK
-  // =========================================================
+  // =======================================================
 
   return (
-    <div
-      className="
-        rounded-2xl
-        border
-        border-white/10
-        bg-slate-950/70
-        p-6
-      "
-    >
+    <div>
 
       <p
         className="
