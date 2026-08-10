@@ -3,15 +3,18 @@
 import re
 
 
+# ============================================================
+# GROUP BY FIELDS
+# ============================================================
+
 GROUP_BY_FIELDS = {
+
+    # --------------------------------------------------------
+    # Geographic dimensions
+    # --------------------------------------------------------
+
     "state": "STATE",
     "states": "STATE",
-
-    "category": "CATEGORY",
-    "categories": "CATEGORY",
-
-    "segment": "SEGMENT",
-    "segments": "SEGMENT",
 
     "city": "CITY",
     "cities": "CITY",
@@ -19,10 +22,57 @@ GROUP_BY_FIELDS = {
     "region": "REGION",
     "regions": "REGION",
 
+    # --------------------------------------------------------
+    # Product dimensions
+    # --------------------------------------------------------
+
+    "category": "CATEGORY",
+    "categories": "CATEGORY",
+
+    "sub-category": "SUB_CATEGORY",
+    "sub-categories": "SUB_CATEGORY",
+
+    "subcategory": "SUB_CATEGORY",
+    "subcategories": "SUB_CATEGORY",
+
+    # --------------------------------------------------------
+    # Customer dimensions
+    # --------------------------------------------------------
+
+    "segment": "SEGMENT",
+    "segments": "SEGMENT",
+
+    # --------------------------------------------------------
+    # Shipping dimensions
+    # --------------------------------------------------------
+
     "ship mode": "SHIP_MODE",
     "ship modes": "SHIP_MODE",
+
+    # --------------------------------------------------------
+    # Time dimensions
+    # --------------------------------------------------------
+
+    "year": "YEAR",
+    "years": "YEAR",
+
+    "quarter": "QUARTER",
+    "quarters": "QUARTER",
+
+    "month": "MONTH",
+    "months": "MONTH",
+
+    "monthly": "MONTH",
+
+    "yearly": "YEAR",
+
+    "quarterly": "QUARTER",
 }
 
+
+# ============================================================
+# DETECT GROUP BY
+# ============================================================
 
 def detect_group_by(question: str):
     """
@@ -30,22 +80,27 @@ def detect_group_by(question: str):
     to group business metrics by.
 
     Examples:
+
         Sales by category
         Sales by region
         Profit by city
+        Sales by month
+        Monthly sales
+        Sales per quarter
         Top 5 cities by sales
-        Highest category by profit
+        Highest region by profit
     """
 
     question = question.lower().strip()
 
     groups = []
 
-    # --------------------------------------------------
-    # Pattern 1:
+    # ========================================================
+    # PATTERN 1
     # "sales by category"
     # "profit by region"
-    # --------------------------------------------------
+    # "sales by month"
+    # ========================================================
 
     for keyword, column in GROUP_BY_FIELDS.items():
 
@@ -54,11 +109,12 @@ def detect_group_by(question: str):
         if re.search(pattern, question):
             groups.append(column)
 
-    # --------------------------------------------------
-    # Pattern 2:
+    # ========================================================
+    # PATTERN 2
     # "sales per category"
     # "profit per region"
-    # --------------------------------------------------
+    # "sales per month"
+    # ========================================================
 
     for keyword, column in GROUP_BY_FIELDS.items():
 
@@ -67,15 +123,48 @@ def detect_group_by(question: str):
         if re.search(pattern, question):
             groups.append(column)
 
-    # --------------------------------------------------
-    # Pattern 3:
-    # ranking questions
+    # ========================================================
+    # PATTERN 3
+    # DIRECT TIME PHRASES
+    #
+    # "monthly sales"
+    # "monthly profit"
+    # "yearly sales"
+    # "quarterly sales"
+    # ========================================================
+
+    direct_time_patterns = {
+
+        "monthly": "MONTH",
+        "month-wise": "MONTH",
+        "monthwise": "MONTH",
+
+        "yearly": "YEAR",
+        "year-wise": "YEAR",
+        "yearwise": "YEAR",
+
+        "quarterly": "QUARTER",
+        "quarter-wise": "QUARTER",
+        "quarterwise": "QUARTER",
+    }
+
+    for keyword, column in direct_time_patterns.items():
+
+        pattern = rf"\b{re.escape(keyword)}\b"
+
+        if re.search(pattern, question):
+            groups.append(column)
+
+    # ========================================================
+    # PATTERN 4
+    # RANKING QUESTIONS
     #
     # "top 5 cities"
     # "bottom 5 categories"
     # "highest region"
     # "lowest city"
-    # --------------------------------------------------
+    # "best category"
+    # ========================================================
 
     ranking_words = [
         "top",
@@ -91,7 +180,10 @@ def detect_group_by(question: str):
     ]
 
     has_ranking_intent = any(
-        re.search(rf"\b{word}\b", question)
+        re.search(
+            rf"\b{re.escape(word)}\b",
+            question
+        )
         for word in ranking_words
     )
 
@@ -104,8 +196,46 @@ def detect_group_by(question: str):
             if re.search(pattern, question):
                 groups.append(column)
 
-    # --------------------------------------------------
-    # Remove duplicates while preserving order
-    # --------------------------------------------------
+    # ========================================================
+    # PATTERN 5
+    # TIME PHRASES
+    #
+    # "sales over months"
+    # "sales across months"
+    # "sales over years"
+    # "sales across quarters"
+    # ========================================================
 
-    return list(dict.fromkeys(groups))
+    time_phrases = {
+
+        "over month": "MONTH",
+        "over months": "MONTH",
+
+        "across month": "MONTH",
+        "across months": "MONTH",
+
+        "over year": "YEAR",
+        "over years": "YEAR",
+
+        "across year": "YEAR",
+        "across years": "YEAR",
+
+        "over quarter": "QUARTER",
+        "over quarters": "QUARTER",
+
+        "across quarter": "QUARTER",
+        "across quarters": "QUARTER",
+    }
+
+    for phrase, column in time_phrases.items():
+
+        if phrase in question:
+            groups.append(column)
+
+    # ========================================================
+    # REMOVE DUPLICATES
+    # ========================================================
+
+    return list(
+        dict.fromkeys(groups)
+    )

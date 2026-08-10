@@ -7,29 +7,35 @@ export default function ResponseTable({
   columns,
   rows,
 }: ResponseTableProps) {
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10">
+    <div className="w-full overflow-x-auto">
 
       <table className="min-w-full">
 
-        <thead className="bg-slate-800/80">
+        <thead className="bg-slate-900">
 
           <tr>
 
             {columns.map((column) => (
+
               <th
                 key={column}
                 className="
+                  whitespace-nowrap
                   px-6
                   py-4
                   text-left
-                  text-sm
+                  text-xs
                   font-semibold
-                  text-cyan-400
+                  uppercase
+                  tracking-wider
+                  text-violet-400
                 "
               >
-                {column}
+                {column.replaceAll("_", " ")}
               </th>
+
             ))}
 
           </tr>
@@ -46,7 +52,7 @@ export default function ResponseTable({
                 border-t
                 border-slate-800
                 transition
-                hover:bg-slate-800/40
+                hover:bg-white/[0.03]
               "
             >
 
@@ -55,13 +61,14 @@ export default function ResponseTable({
                 <td
                   key={column}
                   className="
+                    whitespace-nowrap
                     px-6
                     py-4
                     text-sm
-                    text-slate-200
+                    text-slate-300
                   "
                 >
-                  {row[column]}
+                  {row[column] ?? "—"}
                 </td>
 
               ))}

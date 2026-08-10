@@ -23,8 +23,15 @@ def build_query_plan(question: str):
     a natural language question.
     """
 
-    # Normalize business synonyms
+    # =========================================================
+    # NORMALIZE BUSINESS SYNONYMS
+    # =========================================================
+
     question = normalize_question(question)
+
+    # =========================================================
+    # DETECT METRIC
+    # =========================================================
 
     metric_name, metric = detect_metric(question)
 
@@ -39,7 +46,10 @@ def build_query_plan(question: str):
             }
         ]
 
-    # Detect filters
+    # =========================================================
+    # DETECT FILTERS
+    # =========================================================
+
     filters = detect_filters(question)
 
     date_range = detect_date_range(question)
@@ -50,32 +60,102 @@ def build_query_plan(question: str):
 
     quarter_filters = detect_quarter(question)
 
+    # ---------------------------------------------------------
     # Relative time has priority over explicit year detection
+    # ---------------------------------------------------------
+
     if relative_time:
+
         filters.update(relative_time)
 
     elif not date_range:
+
         filters.update(time_filters)
 
+    # ---------------------------------------------------------
     # Quarter filters
+    # ---------------------------------------------------------
+
     filters.update(quarter_filters)
+
+    # =========================================================
+    # DETECT GROUP BY
+    # =========================================================
 
     group_by = detect_group_by(question)
 
+    # =========================================================
+    # SUB-CATEGORY GROUP BY FALLBACK
+    # =========================================================
+    #
+    # The groupby_service currently does not recognize all
+    # common variations of "sub-category".
+    #
+    # Normalize the common user expressions here so that:
+    #
+    # sub-category
+    # sub category
+    # subcategory
+    # sub-categories
+    # sub categories
+    # subcategories
+    #
+    # all become:
+    #
+    # SUB_CATEGORY
+    #
+    # This does NOT replace the normal group_by detection.
+    # It only acts as a fallback when no group_by was detected.
+    # =========================================================
+
+    normalized_group_question = (
+        question
+        .lower()
+        .replace("-", " ")
+        .replace("_", " ")
+    )
+
+    sub_category_phrases = [
+        "sub category",
+        "sub categories",
+        "subcategory",
+        "subcategories"
+    ]
+
+    if (
+        not group_by
+        and any(
+            phrase in normalized_group_question
+            for phrase in sub_category_phrases
+        )
+    ):
+        group_by = ["SUB_CATEGORY"]
+
+    # =========================================================
+    # DETECT LIMIT
+    # =========================================================
+
     limit = detect_limit(question)
+
+    # =========================================================
+    # DETECT SUPERLATIVE
+    # =========================================================
 
     superlative = detect_superlative(question)
 
-    # ----------------------------------
-    # Default metric for ranking queries
-    # ----------------------------------
+    # =========================================================
+    # DEFAULT METRIC FOR RANKING QUERIES
+    # =========================================================
+    #
     # If the user asks for the strongest/best/highest
     # region, city, category, etc. without explicitly
     # mentioning a metric, default to Total Sales.
+    # =========================================================
+
     if (
-            not matched_metrics
-            and group_by
-            and superlative
+        not matched_metrics
+        and group_by
+        and superlative
     ):
         matched_metrics = [
             {
@@ -83,7 +163,18 @@ def build_query_plan(question: str):
             }
         ]
 
-    order_by = detect_order_by(question, matched_metrics)
+    # =========================================================
+    # ORDER BY
+    # =========================================================
+
+    order_by = detect_order_by(
+        question,
+        matched_metrics
+    )
+
+    # =========================================================
+    # COMPARISONS
+    # =========================================================
 
     comparison = detect_comparison(question)
 
@@ -93,35 +184,66 @@ def build_query_plan(question: str):
 
     having = detect_having(question)
 
-    # A date range takes precedence over year-over-year comparison
+    # =========================================================
+    # DATE RANGE PRIORITY
+    # =========================================================
+
+    # A date range takes precedence over
+    # year-over-year comparison.
+
     if date_range:
         time_comparison = None
 
-    # If it's a comparison query, don't use normal filters
+    # =========================================================
+    # COMPARISON FILTER RULE
+    # =========================================================
+
+    # If it's a comparison query,
+    # don't use normal filters.
+
     if comparison:
         filters = {}
 
+    # =========================================================
+    # QUARTER COMPARISON RULE
+    # =========================================================
+
     # If it's a quarter comparison query,
-    # remove the normal QUARTER filter
+    # remove the normal QUARTER filter.
+
     if quarter_comparison:
         filters.pop("QUARTER", None)
 
+    # =========================================================
+    # TIME COMPARISON RULE
+    # =========================================================
+
     # If it's a time comparison query,
-    # don't use single YEAR filter
+    # don't use a single YEAR filter.
+
     if time_comparison:
         filters = {}
 
-    # Automatically GROUP BY comparison dimension
-    if comparison and not group_by:
-        group_by = [comparison["dimension"]]
+    # =========================================================
+    # AUTOMATIC GROUP BY — COMPARISON
+    # =========================================================
 
-    # Automatically GROUP BY QUARTER
+    if comparison and not group_by:
+        group_by = [
+            comparison["dimension"]
+        ]
+
+    # =========================================================
+    # AUTOMATIC GROUP BY — QUARTER COMPARISON
+    # =========================================================
+
     if quarter_comparison and not group_by:
         group_by = ["QUARTER"]
 
-    # ----------------------------------
-    # Superlative detection
-    # ----------------------------------
+    # =========================================================
+    # SUPERLATIVE DETECTION
+    # =========================================================
+
     if superlative and matched_metrics:
 
         order_by = {
@@ -130,21 +252,37 @@ def build_query_plan(question: str):
         }
 
         # Only apply LIMIT 1 when the user
-        # did not explicitly ask for another limit
+        # did not explicitly ask for another limit.
+
         if limit is None:
             limit = superlative["limit"]
+
+    # =========================================================
+    # BUILD METRIC NAME LIST
+    # =========================================================
 
     metric_names = []
 
     for item in matched_metrics:
-        metric_names.append(item["metric_name"])
+        metric_names.append(
+            item["metric_name"]
+        )
+
+    # =========================================================
+    # FINAL QUERY PLAN
+    # =========================================================
 
     return {
         "question": question,
+
         "metrics": metric_names,
+
         "filters": filters,
+
         "group_by": group_by,
+
         "order_by": order_by,
+
         "limit": limit,
 
         # Semantic comparison
@@ -153,7 +291,7 @@ def build_query_plan(question: str):
         # Quarter comparison
         "quarter_comparison": quarter_comparison,
 
-        # Time comparison (Year-over-Year)
+        # Time comparison
         "time_comparison": time_comparison,
 
         # Date range

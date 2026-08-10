@@ -19,7 +19,7 @@ SEMANTIC_METRICS = {
             "how much did we sell": 4
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "SALES",
         "aggregation": "SUM",
 
@@ -39,7 +39,7 @@ SEMANTIC_METRICS = {
             "mean revenue": 5
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "SALES",
         "aggregation": "AVG",
 
@@ -63,7 +63,7 @@ SEMANTIC_METRICS = {
             "earnings": 3
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "PROFIT",
         "aggregation": "SUM",
 
@@ -82,7 +82,7 @@ SEMANTIC_METRICS = {
             "avg earnings": 5
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "PROFIT",
         "aggregation": "AVG",
 
@@ -107,7 +107,7 @@ SEMANTIC_METRICS = {
             "quantity": 2
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "QUANTITY",
         "aggregation": "SUM",
 
@@ -126,7 +126,7 @@ SEMANTIC_METRICS = {
             "avg units": 5
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "QUANTITY",
         "aggregation": "AVG",
 
@@ -149,7 +149,7 @@ SEMANTIC_METRICS = {
             "orders": 2
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "ORDER_ID",
         "aggregation": "COUNT",
 
@@ -172,7 +172,7 @@ SEMANTIC_METRICS = {
             "discount": 2
         },
 
-        "table": "GLOBAL_SUPERSTORE",
+        "table": "GLOBAL_SUPERSTORE_NEW",
         "column": "DISCOUNT",
         "aggregation": "AVG",
 
