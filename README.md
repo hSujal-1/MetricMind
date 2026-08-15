@@ -1,118 +1,113 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
   <img src="https://img.shields.io/badge/Snowflake-Cloud%20Warehouse-29B5E8?style=for-the-badge&logo=snowflake" alt="Snowflake" />
   <img src="https://img.shields.io/badge/dbt-Analytics-FF694B?style=for-the-badge&logo=dbt" alt="dbt" />
   <img src="https://img.shields.io/badge/License-MIT-black?style=for-the-badge" alt="License" />
 </p>
 
 <h1 align="center">MetricMind</h1>
+
 <h3 align="center">Enterprise Semantic Business Intelligence Engine</h3>
 
 <p align="center">
-  Turn natural language business questions into governed insights — powered by a custom semantic layer, Snowflake, dbt, and FastAPI.
+  Turn natural language business questions into governed business insights using a custom semantic layer, Snowflake, FastAPI, and Next.js.
 </p>
 
 <p align="center">
-  <a href="#-overview">Overview</a> •
-  <a href="#-features">Features</a> •
-  <a href="#-architecture">Architecture</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-api-reference">API</a> •
-  <a href="#-project-status">Status</a>
+  <a href="#overview">Overview</a> •
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#project-structure">Project Structure</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#api-reference">API Reference</a> •
+  <a href="#dashboard">Dashboard</a> •
+  <a href="#project-status">Project Status</a>
 </p>
 
 ---
 
 ## Overview
 
-**MetricMind** is a semantic Business Intelligence engine that bridges the gap between business users and enterprise data — without requiring anyone to write SQL.
+**MetricMind** is a semantic Business Intelligence platform that allows users to interact with business data using natural language instead of writing SQL queries manually.
 
-It takes a natural language question, converts it into a semantic query plan, generates optimized SQL, executes it against **Snowflake**, and returns structured, governed business insights through a REST API.
+A user can ask questions such as:
 
-Built on modern analytics engineering practices — **Snowflake**, **FastAPI**, **dbt**, and a custom semantic layer — MetricMind is designed to be modular, scalable, and AI-ready, supporting:
+```text
+What are the total sales?
+What is the total profit?
+What are the sales by region?
+What are the sales by category?
+What are the top 10 cities by sales?
+```
 
-- Semantic metrics & KPI analytics
-- Natural language querying
-- Intelligent SQL generation
-- An enterprise-grade semantic layer
-- AI-powered conversational BI *(in progress)*
+MetricMind interprets the question, maps it to governed business metrics through a semantic layer, generates and validates SQL, executes it against Snowflake, and returns structured, chart-ready results.
 
 ---
 
 ## Features
 
-<table>
-<tr>
-<td valign="top" width="50%">
-
-**Semantic Intelligence**
-- Semantic metric detection
-- Natural language query planning
-- Dynamic SQL generation
-- Enterprise semantic layer
-- Snowflake query execution
-
-**Business Intelligence**
-- KPI queries
-- Business filter detection
-- `GROUP BY` / `ORDER BY` / `LIMIT` detection
-- Aggregate filtering (`HAVING`)
-
-</td>
-<td valign="top" width="50%">
-
-**Time Intelligence**
-- Year filters & date range queries
-- Relative time intelligence
-- Quarter intelligence & comparison
-
-**Comparison Engine**
-- State / category / quarter comparison
-- Multi-dimensional semantic queries
-
-**Backend**
-- FastAPI REST APIs
-- Metadata discovery APIs
-- Semantic query APIs
-
-</td>
-</tr>
-</table>
-
-### Upcoming
-
-Conversational BI assistant · AI dashboard generation · Visualization recommendation engine · LangChain integration · Interactive analytics dashboard · Authentication & user management · Query history · KPI monitoring · Report export (PDF / Excel)
+- Natural language to SQL query translation
+- Governed semantic metric definitions (single source of truth for business logic)
+- Automatic SQL generation and validation before execution
+- Interactive Business Intelligence dashboard with KPIs and charts
+- REST API with full Swagger/OpenAPI documentation
+- Snowflake-backed data warehouse integration
 
 ---
 
 ## Architecture
 
+MetricMind follows a layered architecture that separates the frontend interface, backend API layer, semantic intelligence, query execution, and data warehouse.
+
 ```mermaid
 flowchart TD
-    A[Business User]
-    B[Next.js Frontend<br/>Dashboards • Chat • Analytics]
-    C[FastAPI Backend<br/>Authentication • API • Business Logic]
-    D[Semantic Metrics<br/>Business Metrics & KPIs]
-    E[AI Query Engine<br/>LangChain + LLM]
-    F[Metadata Services<br/>Tables • Columns]
-    G[Semantic Query Generation]
-    H[(Snowflake Data Warehouse)]
-    I[dbt Models & Business Transformations]
-    J[Raw Business Data<br/>CSV / Excel / APIs]
 
-    A -->|Natural Language / Dashboard Interaction| B
-    B -->|REST API| C
+    A[Business User]
+
+    B[Next.js Frontend]
+    B1[Natural Language Interface]
+    B2[Interactive Dashboard]
+    B3[Charts & Response Rendering]
+    B4[Documentation]
+
+    C[FastAPI Backend]
+
+    D[Query Processing Layer]
+    D1[Query Planner]
+    D2[Semantic Metrics]
+    D3[SQL Generator]
+    D4[SQL Validator]
+
+    E[Execution Engine]
+
+    F[(Snowflake Data Warehouse)]
+
+    A --> B
+
+    B --> B1
+    B --> B2
+    B --> B3
+    B --> B4
+
+    B1 -->|REST API| C
+    B2 -->|Dashboard API| C
+
     C --> D
-    C --> E
-    C --> F
-    D --> G
-    E --> G
-    F --> G
-    G --> H
-    J --> I
-    I --> H
+
+    D --> D1
+    D1 --> D2
+    D1 --> D3
+    D3 --> D4
+
+    D4 --> E
+    E --> F
+
+    F --> E
+    E --> C
+    C --> B
 
     classDef user fill:#f5f5f5,stroke:#333,stroke-width:1px;
     classDef frontend fill:#dbe9ff,stroke:#333,stroke-width:1px;
@@ -121,10 +116,10 @@ flowchart TD
     classDef data fill:#d9ead3,stroke:#333,stroke-width:1px;
 
     class A user;
-    class B frontend;
+    class B,B1,B2,B3,B4 frontend;
     class C backend;
-    class D,E,F,G core;
-    class H,I,J data;
+    class D,D1,D2,D3,D4,E core;
+    class F data;
 ```
 
 ---
@@ -133,234 +128,366 @@ flowchart TD
 
 | Layer | Technology |
 |---|---|
-| Language | Python 3.13 |
+| Programming Language | Python 3.13 |
 | Backend Framework | FastAPI |
-| Database | Snowflake |
-| Data Transformation | dbt |
+| Frontend Framework | Next.js 16 |
+| Frontend Language | TypeScript |
+| Database / Data Warehouse | Snowflake |
 | Semantic Layer | Custom Python semantic layer |
-| AI Integration | LangChain *(planned)* |
-| Frontend | Next.js *(planned)* |
+| Query Processing | Python |
+| Data Visualization | Recharts |
+| API Communication | REST API |
 | Version Control | Git & GitHub |
+| API Testing | Swagger UI |
 | IDE | PyCharm |
-| API Testing | Swagger UI / Postman |
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 MetricMind/
 │
 ├── backend/
 │   ├── app/
-│   │   ├── api/                 # REST API endpoints
-│   │   ├── semantic/            # Semantic metrics & metadata
-│   │   ├── services/            # Query planner & SQL generator
-│   │   ├── database/            # Snowflake connection
-│   │   └── main.py              # FastAPI entry point
-│   │
-│   ├── database/
-│   │   └── migrations/          # Database migration scripts
+│   │   ├── models/
+│   │   │
+│   │   ├── routers/
+│   │   │   └── metrics.py
+│   │   │
+│   │   ├── semantic/
+│   │   │   └── metrics.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── execution_engine.py
+│   │   │   ├── query_planner.py
+│   │   │   ├── sql_generator.py
+│   │   │   ├── sql_validator.py
+│   │   │   ├── metrics_service.py
+│   │   │   └── snowflake_service.py
+│   │   │
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   └── main.py
 │   │
 │   └── requirements.txt
 │
-├── frontend/                    # Next.js frontend (upcoming)
-├── dashboard/                   # Dashboard (upcoming)
-├── dbt/                         # dbt models
-├── docs/                        # Documentation
-├── sql/                         # SQL scripts
-├── images/                      # Project images
-├── tests/                       # Unit tests
+├── frontend/
+│   ├── app/
+│   │   ├── dashboard/
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── docs/
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components/
+│   │   ├── chat/
+│   │   │   └── ChatBox.tsx
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── Hero.tsx
+│   │   │   └── Navbar.tsx
+│   │   │
+│   │   ├── BarChart.tsx
+│   │   ├── HorizontalBarChart.tsx
+│   │   ├── InsightCard.tsx
+│   │   ├── KPICard.tsx
+│   │   ├── LineChart.tsx
+│   │   ├── PieChart.tsx
+│   │   ├── ResponseRenderer.tsx
+│   │   ├── ResponseTable.tsx
+│   │   └── VisualizationEngine.tsx
+│   │
+│   ├── services/
+│   │   ├── api.ts
+│   │   └── dashboardService.ts
+│   │
+│   ├── next.config.ts
+│   └── package.json
 │
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── LICENSE
 ```
 
 ---
 
 ## Installation
 
+### Prerequisites
+
+Make sure the following are installed before running MetricMind:
+
+- Python 3.13
+- Node.js and npm
+- Git
+- PyCharm (Professional or Community)
+- Access to a configured Snowflake account
+
+### 1. Clone the Repository
+
 ```bash
-# Clone the repository
 git clone https://github.com/hSujal-1/MetricMind.git
 cd MetricMind
+```
 
-# Create a virtual environment
-python -m venv .venv
+Open the `MetricMind` folder in **PyCharm** as a project (`File → Open`).
 
-# Activate it
+### 2. Backend Setup
+
+Create a Python virtual environment:
+
+```bash
+python -m venv venv
+```
+
+Activate the environment:
+
+```bash
 # Windows
-.venv\Scripts\activate
-# Linux / macOS
-source .venv/bin/activate
+.\venv\Scripts\activate
 
-# Install dependencies
+# macOS / Linux
+source venv/bin/activate
+```
+
+In PyCharm, set this `venv` as the project interpreter:
+`File → Settings → Project: MetricMind → Python Interpreter → Add Interpreter → Existing Environment → select venv/Scripts/python.exe (or venv/bin/python)`.
+
+Install the backend dependencies:
+
+```bash
 pip install -r backend/requirements.txt
 ```
 
-### Running the project
+Configure the required Snowflake credentials and application settings in the backend environment configuration.
+
+> Do not commit credentials, passwords, tokens, or environment files containing secrets to GitHub.
+
+### 3. Start the Backend
+
+From the project root, with the virtual environment activated:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0
 ```
 
-| Docs | URL |
+You can also run this directly from PyCharm by creating a **Run/Debug Configuration** of type *uvicorn* (or a Python configuration pointing to `app.main` with `uvicorn` as the module).
+
+The backend will run on:
+
+```
+http://127.0.0.1:8000
+```
+
+### 4. Backend API Documentation
+
+FastAPI provides interactive API documentation through Swagger UI:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+ReDoc is also available at:
+
+```
+http://127.0.0.1:8000/redoc
+```
+
+### 5. Frontend Setup
+
+Open a new terminal (PyCharm's integrated terminal works fine) and navigate to the frontend:
+
+```bash
+cd frontend
+npm install
+```
+
+Start the Next.js development server:
+
+```bash
+npm run dev -- --hostname 0.0.0.0
+```
+
+The frontend will run on:
+
+```
+http://localhost:3000
+```
+
+### 6. Application Routes
+
+| Route | Description |
 |---|---|
+| `/` | Main MetricMind natural-language analytics interface |
+| `/dashboard` | Interactive Business Intelligence dashboard |
+| `/docs` | MetricMind project documentation |
+
+Local development URLs:
+
+| Application | URL |
+|---|---|
+| Main Application | `http://localhost:3000` |
+| Dashboard | `http://localhost:3000/dashboard` |
+| Documentation | `http://localhost:3000/docs` |
+| Backend API | `http://127.0.0.1:8000` |
 | Swagger UI | `http://127.0.0.1:8000/docs` |
-| ReDoc | `http://127.0.0.1:8000/redoc` |
+
+### 7. Running Backend and Frontend Together
+
+MetricMind requires both services to be running during local development.
+
+**Terminal 1 — Backend**
+
+```bash
+cd MetricMind
+# activate venv first (see step 2)
+uvicorn app.main:app --reload --host 0.0.0.0
+```
+
+**Terminal 2 — Frontend**
+
+```bash
+cd MetricMind/frontend
+npm run dev -- --hostname 0.0.0.0
+```
+
+Once both services are running, open:
+
+```
+http://localhost:3000
+```
+
+### 8. Production Build Verification
+
+To verify the Next.js frontend production build:
+
+```bash
+cd frontend
+npm run build
+```
+
+A successful build verifies frontend compilation, TypeScript validation, route generation, and production optimization.
 
 ---
 
 ## API Reference
 
+MetricMind exposes REST APIs through FastAPI for semantic query processing, SQL generation, metadata access, health monitoring, and natural-language business analysis.
+
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/` | Welcome endpoint |
-| GET | `/health` | Health check |
-| GET | `/db-health` | Verify Snowflake connection |
-| GET | `/tables` | List available tables |
-| GET | `/tables/{table_name}/columns` | Retrieve table schema |
-| POST | `/queryplanner` | Generate semantic query plan |
-| POST | `/generate-sql` | Generate SQL from semantic query plan |
-| POST | `/ask` | Execute a natural language query and return results |
+| GET | `/health` | Application health check |
+| GET | `/db-health` | Verify Snowflake connectivity |
+| GET | `/tables` | List available database tables |
+| GET | `/tables/{table_name}/columns` | Retrieve table column metadata |
+| POST | `/queryplanner` | Generate a semantic query plan |
+| POST | `/generate-sql` | Generate SQL from a semantic query plan |
+| POST | `/ask` | Process a natural-language business question and return structured results |
+
+### Natural Language Query
+
+The primary analytics endpoint is:
+
+```
+POST /ask
+```
+
+Example request:
+
+```json
+{
+  "question": "What are the total sales?"
+}
+```
+
+The backend processes the question through the semantic query pipeline, executes the resulting query against Snowflake, and returns a structured response for the frontend.
+
+### API Documentation
+
+Interactive API documentation is available through Swagger UI:
+
+```
+http://127.0.0.1:8000/docs
+```
 
 ---
 
-## Example Queries
+## Dashboard
 
-<details>
-<summary><strong>KPI queries</strong></summary>
+MetricMind includes an interactive Business Intelligence dashboard for visual analysis of business performance.
 
-```text
-Total Sales
-Total Profit
-Total Orders
-Total Quantity
-Average Discount
+The dashboard is available at:
+
 ```
-</details>
-
-<details>
-<summary><strong>Business filters</strong></summary>
-
-```text
-Sales in California
-Profit in Texas
-Technology Sales
-Furniture Profit
-Office Supplies Orders
+/dashboard
 ```
-</details>
 
-<details>
-<summary><strong>Group by queries</strong></summary>
+### KPI Summary
 
-```text
-Sales by City
-Profit by Category
-Orders by State
-Sales by Region
-Profit by Segment
-```
-</details>
+The dashboard includes:
 
-<details>
-<summary><strong>Ranking queries</strong></summary>
+- Total Sales
+- Total Profit
+- Regional Coverage
+- Top City Performance
 
-```text
-Top 10 Cities by Sales
-Top 5 Categories by Profit
-Highest Profit States
-Lowest Sales Regions
-Top 20 Cities by Orders
-```
-</details>
+### Visual Analysis
 
-<details>
-<summary><strong>Aggregate filtering (HAVING)</strong></summary>
+The dashboard provides interactive visualizations for:
 
-```text
-Cities with Sales above 500000
-Categories with Profit below 10000
-States with Orders above 2000
-```
-</details>
+| Visualization | Purpose |
+|---|---|
+| Sales Trend | Analyze sales performance across time |
+| Sales by Region | Compare sales across different regions |
+| Sales by Category | Analyze category contribution to overall sales |
+| Top 10 Cities | Identify the highest-performing cities by sales |
 
-<details>
-<summary><strong>Comparison queries</strong></summary>
-
-```text
-Compare California and Texas Sales
-Compare Technology and Furniture Profit
-Compare Office Supplies and Technology Orders
-```
-</details>
-
-<details>
-<summary><strong>Time intelligence</strong></summary>
-
-```text
-Sales in 2014
-Profit after 2013
-Sales between 2012 and 2014
-Orders this year
-Sales last year
-Profit previous year
-```
-</details>
-
-<details>
-<summary><strong>Quarter intelligence</strong></summary>
-
-```text
-Sales in Q1
-Profit in Quarter 2
-Orders in Q3
-Sales in Q2 2014
-Profit in Q4 this year
-Compare Q1 and Q2 Sales
-Compare Q3 and Q4 Profit
-```
-</details>
-
-<details>
-<summary><strong>Complex semantic queries</strong></summary>
-
-```text
-Top 10 Cities with Sales between 2012 and 2014
-Top 5 Categories with Sales above 500000
-Compare Technology and Furniture Profit
-Compare Q1 and Q2 Sales in 2014
-Sales in California during Q2
-Categories with Profit after 2013
-Top 10 Cities by Profit in Q3
-```
-</details>
+Charts include interactive hover information to allow users to inspect individual values directly from the visualization.
 
 ---
 
 ## Project Status
 
-**Status:** 🟢 Active development &nbsp;|&nbsp; **Version:** v0.9 (Backend) &nbsp;|&nbsp; **Backend completion:** ~92%
+**Status:** Completed Project Submission
 
-| Module |      Status      |
-|---|:----------------:|
-| Backend APIs | Completed (core) |
-| Semantic query engine |    Completed     |
-| Snowflake integration |    Completed     |
-| Natural language query planner |    Completed     |
-| Dynamic SQL generator |     Completed    |
-| Frontend dashboard |   In progress  |
-| AI copilot (LLM) |     Planned    |
+| Module | Status |
+|---|:---:|
+| FastAPI Backend | Completed |
+| Semantic Query Engine | Completed |
+| Metric Detection | Completed |
+| Query Planning | Completed |
+| Dynamic SQL Generation | Completed |
+| SQL Validation | Completed |
+| Snowflake Integration | Completed |
+| Natural Language Querying | Completed |
+| Frontend Interface | Completed |
+| Interactive Visualizations | Completed |
+| Business Intelligence Dashboard | Completed |
+| Project Documentation | Completed |
+| Production Frontend Build | Verified |
 
 ---
 
-## Vision
+## Repository
 
-The long-term goal is to evolve MetricMind into a full AI-powered BI platform — supporting conversational analytics, intelligent dashboard generation, and automated business insights on top of the semantic layer already in place.
+GitHub Repository: [https://github.com/hSujal-1/MetricMind]
 
 ---
 
 ## License
 
 Licensed under the [MIT License](LICENSE).
+
+---
+
+## Author
+
+**Sujal Jambotkar**
+
+MetricMind was developed as a Business Intelligence project focused on semantic analytics, natural-language querying, data visualization, and enterprise-oriented analytics workflows.
