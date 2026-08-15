@@ -17,77 +17,118 @@ type HorizontalBarChartProps = {
   title?: string;
 };
 
+type ChartRow = {
+  label: string;
+  value: number;
+};
+
 export default function HorizontalBarChart({
   data,
   xKey,
   yKey,
   title,
 }: HorizontalBarChartProps) {
-  if (!data || !data.length) {
+  // =========================================================
+  // EMPTY STATE
+  // =========================================================
+
+  if (!data || data.length === 0) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-8 text-center">
-        <p className="text-slate-400">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-[#E7DED2]
+          bg-[#FFFDF8]
+          p-8
+          text-center
+        "
+      >
+        <p className="text-sm text-[#756F67]">
           No visualization data available.
         </p>
       </div>
     );
   }
 
-  // ---------------------------------------------------------
-  // Prepare chart data
-  // ---------------------------------------------------------
+  // =========================================================
+  // PREPARE CHART DATA
+  // =========================================================
 
-  const chartData = data
-    .map((row) => ({
-      [xKey]: String(row[xKey] ?? "Unknown"),
-      [yKey]: Number(row[yKey]) || 0,
+  const chartData: ChartRow[] = data
+    .map((row): ChartRow => ({
+      label: String(row[xKey] ?? "Unknown"),
+      value: Number(row[yKey]) || 0,
     }))
-    .sort((a, b) => b[yKey] - a[yKey]);
+    .sort((a, b) => b.value - a.value);
 
-  // ---------------------------------------------------------
-  // Display only top 15 categories
-  // ---------------------------------------------------------
+  // =========================================================
+  // DISPLAY TOP 15
+  // =========================================================
 
   const visibleData = chartData.slice(0, 15);
 
-  // ---------------------------------------------------------
-  // Format large numbers
-  // ---------------------------------------------------------
+  // =========================================================
+  // FORMAT LARGE NUMBERS
+  // =========================================================
 
-  const formatValue = (value: number) => {
-    if (Math.abs(value) >= 1000000) {
-      return `${(value / 1000000).toFixed(1)}M`;
+  const formatValue = (value: number): string => {
+    if (Math.abs(value) >= 1_000_000) {
+      return `${(value / 1_000_000).toFixed(1)}M`;
     }
 
-    if (Math.abs(value) >= 1000) {
-      return `${(value / 1000).toFixed(1)}K`;
+    if (Math.abs(value) >= 1_000) {
+      return `${(value / 1_000).toFixed(1)}K`;
     }
 
-    return value.toLocaleString();
+    return value.toLocaleString("en-IN");
   };
 
-  return (
-    <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-6">
+  // =========================================================
+  // CHART
+  // =========================================================
 
-      {/* ---------------------------------------------------
-          Title
-      --------------------------------------------------- */}
+  return (
+    <div
+      className="
+        rounded-2xl
+        border
+        border-[#E7DED2]
+        bg-[#FFFDF8]
+        p-6
+      "
+    >
+      {/* =====================================================
+          TITLE
+      ===================================================== */}
 
       {title && (
         <div className="mb-6">
-          <h4 className="text-lg font-semibold text-white">
+          <h4
+            className="
+              text-lg
+              font-semibold
+              text-[#25221F]
+            "
+          >
             {title}
           </h4>
 
-          <p className="mt-1 text-sm text-slate-400">
-            Showing top {visibleData.length} categories
+          <p
+            className="
+              mt-1
+              text-sm
+              text-[#756F67]
+            "
+          >
+            Showing top {visibleData.length} results
           </p>
         </div>
       )}
 
-      {/* ---------------------------------------------------
-          Chart
-      --------------------------------------------------- */}
+      {/* =====================================================
+          CHART
+      ===================================================== */}
 
       <div
         style={{
@@ -101,84 +142,102 @@ export default function HorizontalBarChart({
             layout="vertical"
             margin={{
               top: 10,
-              right: 30,
+              right: 45,
               left: 20,
               bottom: 10,
             }}
           >
+            {/* =================================================
+                GRID
+            ================================================= */}
 
             <CartesianGrid
               strokeDasharray="3 3"
               horizontal={false}
-              stroke="rgba(255,255,255,0.08)"
+              stroke="#E7DED2"
             />
 
-            {/* ------------------------------------------------
-                Category axis
-            ------------------------------------------------ */}
+            {/* =================================================
+                CATEGORY AXIS
+            ================================================= */}
 
             <YAxis
               type="category"
-              dataKey={xKey}
+              dataKey="label"
               width={130}
               tick={{
-                fill: "#94a3b8",
+                fill: "#756F67",
                 fontSize: 12,
+                fontWeight: 500,
               }}
               axisLine={false}
               tickLine={false}
             />
 
-            {/* ------------------------------------------------
-                Numeric axis
-            ------------------------------------------------ */}
+            {/* =================================================
+                NUMERIC AXIS
+            ================================================= */}
 
             <XAxis
               type="number"
+              dataKey="value"
               tick={{
-                fill: "#64748b",
+                fill: "#756F67",
                 fontSize: 11,
+                fontWeight: 500,
               }}
               tickFormatter={formatValue}
-              axisLine={false}
+              axisLine={{
+                stroke: "#E7DED2",
+              }}
               tickLine={false}
             />
 
-            {/* ------------------------------------------------
-                Tooltip
-            ------------------------------------------------ */}
+            {/* =================================================
+                TOOLTIP
+            ================================================= */}
 
             <Tooltip
               cursor={{
-                fill: "rgba(255,255,255,0.04)",
+                fill: "rgba(198,93,50,0.06)",
               }}
               contentStyle={{
-                backgroundColor: "#020617",
-                border: "1px solid rgba(255,255,255,0.12)",
+                backgroundColor: "#FFFDF8",
+                border: "1px solid #E7DED2",
                 borderRadius: "12px",
-                color: "#ffffff",
+                color: "#25221F",
+                boxShadow:
+                  "0 10px 30px rgba(70,50,30,0.12)",
+              }}
+              labelStyle={{
+                color: "#25221F",
+                fontWeight: 600,
+                marginBottom: "4px",
+              }}
+              itemStyle={{
+                color: "#C65D32",
+                fontWeight: 600,
               }}
               formatter={(value: any) => [
-                Number(value).toLocaleString(),
-                yKey,
+                Number(value).toLocaleString("en-IN"),
+                yKey.replaceAll("_", " "),
               ]}
             />
 
-            {/* ------------------------------------------------
-                Bars
-            ------------------------------------------------ */}
+            {/* =================================================
+                BARS
+            ================================================= */}
 
             <Bar
-              dataKey={yKey}
+              dataKey="value"
+              name={yKey.replaceAll("_", " ")}
               radius={[0, 8, 8, 0]}
-              fill="#8b5cf6"
+              fill="#C65D32"
               barSize={24}
             />
-
           </BarChart>
         </ResponsiveContainer>
       </div>
-
     </div>
   );
 }

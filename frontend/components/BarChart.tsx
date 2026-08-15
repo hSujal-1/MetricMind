@@ -22,7 +22,10 @@ export default function BusinessBarChart({
   yKey,
 }: BusinessBarChartProps) {
 
-  // Convert metric values safely into numbers
+  // =========================================================
+  // NORMALIZE METRIC VALUES
+  // =========================================================
+
   const normalizedData = data.map((item) => {
 
     const rawValue = item[yKey];
@@ -30,13 +33,17 @@ export default function BusinessBarChart({
     let numericValue: number;
 
     if (typeof rawValue === "number") {
+
       numericValue = rawValue;
+
     } else {
+
       numericValue = Number(
         String(rawValue ?? "")
           .replace(/,/g, "")
           .trim()
       );
+
     }
 
     return {
@@ -47,20 +54,42 @@ export default function BusinessBarChart({
     };
   });
 
-  console.log("Chart data:", normalizedData);
-  console.log("X key:", xKey);
-  console.log("Y key:", yKey);
+  // =========================================================
+  // DEBUG
+  // =========================================================
 
-  // Empty state
+
+  // =========================================================
+  // EMPTY STATE
+  // =========================================================
+
   if (!normalizedData.length) {
+
     return (
-      <div className="flex h-[380px] items-center justify-center rounded-2xl border border-white/10 bg-slate-900/50">
-        <p className="text-slate-500">
+      <div
+        className="
+          flex
+          h-[380px]
+          items-center
+          justify-center
+          rounded-2xl
+          border
+          border-[#E7DED2]
+          bg-[#FFFDF8]
+        "
+      >
+
+        <p className="text-sm text-[#756F67]">
           No chart data available.
         </p>
+
       </div>
     );
   }
+
+  // =========================================================
+  // CHART
+  // =========================================================
 
   return (
     <div className="h-[380px] w-full">
@@ -80,20 +109,29 @@ export default function BusinessBarChart({
           }}
         >
 
+          {/* =================================================
+              GRID
+          ================================================= */}
+
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="rgba(255,255,255,0.07)"
+            stroke="#E7DED2"
             vertical={false}
           />
+
+          {/* =================================================
+              X AXIS
+          ================================================= */}
 
           <XAxis
             dataKey={xKey}
             tick={{
-              fill: "#94a3b8",
+              fill: "#756F67",
               fontSize: 12,
+              fontWeight: 500,
             }}
             axisLine={{
-              stroke: "rgba(255,255,255,0.12)",
+              stroke: "#E7DED2",
             }}
             tickLine={false}
             angle={-30}
@@ -102,13 +140,18 @@ export default function BusinessBarChart({
             height={80}
           />
 
+          {/* =================================================
+              Y AXIS
+          ================================================= */}
+
           <YAxis
             tick={{
-              fill: "#94a3b8",
+              fill: "#756F67",
               fontSize: 12,
+              fontWeight: 500,
             }}
             axisLine={{
-              stroke: "rgba(255,255,255,0.12)",
+              stroke: "#E7DED2",
             }}
             tickLine={false}
             tickFormatter={(value) =>
@@ -116,9 +159,16 @@ export default function BusinessBarChart({
             }
           />
 
+          {/* =================================================
+              TOOLTIP
+          ================================================= */}
+
           <Tooltip
-            cursor={false}
+            cursor={{
+              fill: "rgba(198,93,50,0.06)",
+            }}
             formatter={(value: any) => {
+
               const numberValue = Number(value);
 
               return Number.isFinite(numberValue)
@@ -126,25 +176,31 @@ export default function BusinessBarChart({
                 : "0";
             }}
             contentStyle={{
-              backgroundColor: "#0f172a",
-              border: "1px solid rgba(139,92,246,0.35)",
+              backgroundColor: "#FFFDF8",
+              border: "1px solid #E7DED2",
               borderRadius: "12px",
-              color: "#ffffff",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+              color: "#25221F",
+              boxShadow:
+                "0 10px 30px rgba(70,50,30,0.12)",
             }}
             labelStyle={{
-              color: "#c4b5fd",
+              color: "#25221F",
               fontWeight: 600,
               marginBottom: "4px",
             }}
             itemStyle={{
-              color: "#22d3ee",
+              color: "#C65D32",
+              fontWeight: 600,
             }}
           />
 
+          {/* =================================================
+              BAR
+          ================================================= */}
+
           <Bar
             dataKey={yKey}
-            fill="#8b5cf6"
+            fill="#C65D32"
             radius={[8, 8, 0, 0]}
             minPointSize={4}
           />

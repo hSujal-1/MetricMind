@@ -1,11 +1,29 @@
 export default function LoadingSpinner() {
   return (
-    <div className="flex items-center justify-center gap-3 py-8">
-      <div className="h-5 w-5 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
+    <div className="flex items-center justify-center gap-3">
 
-      <span className="text-slate-400">
+      <div
+        className="
+          h-6
+          w-6
+          animate-spin
+          rounded-full
+          border-2
+          border-[#E7DED2]
+          border-t-[#C65D32]
+        "
+      />
+
+      <p
+        className="
+          text-sm
+          font-medium
+          text-[#756F67]
+        "
+      >
         Analyzing your question...
-      </span>
+      </p>
+
     </div>
   );
 }

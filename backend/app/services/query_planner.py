@@ -150,6 +150,12 @@ def build_query_plan(question: str):
 
     quarter_filters = detect_quarter(question)
 
+    # ========================================================
+    # DETECT TIME COMPARISON
+    # ========================================================
+
+    time_comparison = detect_time_comparison(question)
+
     # --------------------------------------------------------
     # Relative time has priority over explicit year detection
     # --------------------------------------------------------
@@ -158,7 +164,7 @@ def build_query_plan(question: str):
 
         filters.update(relative_time)
 
-    elif not date_range:
+    elif not date_range and not time_comparison:
 
         filters.update(time_filters)
 
@@ -249,17 +255,35 @@ def build_query_plan(question: str):
 
     quarter_comparison = detect_quarter_comparison(question)
 
-    time_comparison = detect_time_comparison(question)
-
     having = detect_having(question)
 
     # ========================================================
-    # DATE RANGE PRIORITY
+    # TIME COMPARISON PRIORITY
+    # ========================================================
+    #
+    # IMPORTANT:
+    #
+    # Questions such as:
+    #
+    # "How did sales change from 2013 to 2014?"
+    #
+    # may also be detected as:
+    #
+    # date_range = {
+    #     "operator": "BETWEEN",
+    #     "start": 2013,
+    #     "end": 2014
+    # }
+    #
+    # But semantically this is a comparison.
+    #
+    # Therefore time_comparison must take priority
+    # over date_range.
     # ========================================================
 
-    if date_range:
+    if time_comparison:
 
-        time_comparison = None
+        date_range = None
 
     # ========================================================
     # COMPARISON FILTER RULE
@@ -279,6 +303,15 @@ def build_query_plan(question: str):
 
     # ========================================================
     # TIME COMPARISON RULE
+    # ========================================================
+    #
+    # A time comparison should not use a single YEAR filter.
+    #
+    # Example:
+    #
+    # "Compare sales between 2013 and 2014"
+    #
+    # We want both years returned separately.
     # ========================================================
 
     if time_comparison:
@@ -302,6 +335,30 @@ def build_query_plan(question: str):
     if quarter_comparison and not group_by:
 
         group_by = ["QUARTER"]
+
+    # ========================================================
+    # AUTOMATIC GROUP BY — TIME COMPARISON
+    # ========================================================
+    #
+    # Example:
+    #
+    # "How did sales change from 2013 to 2014?"
+    #
+    # The result should be:
+    #
+    # YEAR | TOTAL_SALES
+    # 2013 | ...
+    # 2014 | ...
+    #
+    # rather than:
+    #
+    # TOTAL_SALES
+    # 2013 + 2014
+    # ========================================================
+
+    if time_comparison and not group_by:
+
+        group_by = ["YEAR"]
 
     # ========================================================
     # SUPERLATIVE DETECTION

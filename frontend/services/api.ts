@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "http://172.20.10.9:8000";
 
 export async function askMetricMind(question: string) {
   const response = await fetch(`${API_BASE_URL}/api/ask`, {

@@ -85,3 +85,16 @@ body{
   background:#475569;
 
 }
+/* =========================================================
+   MetricMind - Warm Theme Text Selection
+   ========================================================= */
+
+::selection {
+  background: rgba(217, 154, 91, 0.35);
+  color: #25221F;
+}
+
+::-moz-selection {
+  background: rgba(217, 154, 91, 0.35);
+  color: #25221F;
+}

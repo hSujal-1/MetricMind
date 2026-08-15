@@ -48,7 +48,7 @@ function formatNumber(value: any): string {
     return String(value ?? "");
   }
 
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 2,
   }).format(number);
 }
@@ -62,16 +62,6 @@ function formatMetricName(column: string): string {
 
 // ============================================================
 // GET SINGLE METRIC DISPLAY NAME
-// ============================================================
-//
-// Examples:
-//
-// TOTAL_SALES     -> Sales
-// TOTAL_PROFIT    -> Profit
-// TOTAL_QUANTITY  -> Quantity
-//
-// This prevents the visualization from always saying "Sales"
-// when the user actually asks for profit or quantity.
 // ============================================================
 
 function getSingleMetricName(metricKey: string): string {
@@ -126,26 +116,48 @@ function MultiMetricTooltip({
   }
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#080d20] px-4 py-3 shadow-xl">
-      <p className="mb-2 text-sm font-semibold text-white">
+    <div
+      className="
+        rounded-xl
+        border
+        border-[#E7DED2]
+        bg-[#FFFDF8]
+        px-4
+        py-3
+        shadow-[0_10px_30px_rgba(101,74,48,0.12)]
+      "
+    >
+      <p className="mb-2 text-sm font-semibold text-[#25221F]">
         {String(label)}
       </p>
 
       <div className="space-y-1">
+
         {payload.map((item, index) => (
+
           <div
             key={`${item.dataKey}-${index}`}
-            className="flex items-center justify-between gap-6 text-xs"
+            className="
+              flex
+              items-center
+              justify-between
+              gap-6
+              text-xs
+            "
           >
-            <span className="text-slate-400">
+
+            <span className="text-[#756F67]">
               {formatMetricName(item.dataKey)}
             </span>
 
-            <span className="font-semibold text-white">
+            <span className="font-semibold text-[#C65D32]">
               {formatNumber(item.value)}
             </span>
+
           </div>
+
         ))}
+
       </div>
     </div>
   );
@@ -168,24 +180,47 @@ function MultiMetricBarChart({
   title: string;
   horizontal?: boolean;
 }) {
+
+  const chartColors = [
+    "#C65D32",
+    "#D99A5B",
+    "#3F7D58",
+    "#8C6A4A",
+    "#B94A48",
+  ];
+
   return (
-    <div className="w-full rounded-xl border border-white/10 bg-[#070c1d] p-4">
+    <div
+      className="
+        w-full
+        rounded-2xl
+        border
+        border-[#E7DED2]
+        bg-[#FFFDF8]
+        p-4
+        sm:p-5
+      "
+    >
 
       <div className="mb-4">
-        <h4 className="text-sm font-semibold text-white">
+
+        <h4 className="text-base font-semibold text-[#25221F]">
           {title}
         </h4>
 
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-[#756F67]">
           Comparison across multiple business metrics.
         </p>
+
       </div>
 
-      <div className="h-[380px] w-full">
+      <div className="h-[300px] w-full sm:h-[340px] lg:h-[380px]">
+
         <ResponsiveContainer
           width="100%"
           height="100%"
         >
+
           <RechartsBarChart
             data={data}
             layout={
@@ -200,21 +235,31 @@ function MultiMetricBarChart({
               bottom: 40,
             }}
           >
+
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.08)"
+              stroke="#E7DED2"
+              vertical={!horizontal}
+              horizontal={horizontal}
             />
 
             {horizontal ? (
+
               <>
+
                 <XAxis
                   type="number"
                   tick={{
-                    fill: "#94a3b8",
+                    fill: "#756F67",
                     fontSize: 11,
                   }}
-                  axisLine={false}
+                  axisLine={{
+                    stroke: "#E7DED2",
+                  }}
                   tickLine={false}
+                  tickFormatter={(value) =>
+                    formatNumber(value)
+                  }
                 />
 
                 <YAxis
@@ -222,22 +267,28 @@ function MultiMetricBarChart({
                   dataKey={xKey}
                   width={120}
                   tick={{
-                    fill: "#94a3b8",
+                    fill: "#756F67",
                     fontSize: 11,
                   }}
                   axisLine={false}
                   tickLine={false}
                 />
+
               </>
+
             ) : (
+
               <>
+
                 <XAxis
                   dataKey={xKey}
                   tick={{
-                    fill: "#94a3b8",
+                    fill: "#756F67",
                     fontSize: 11,
                   }}
-                  axisLine={false}
+                  axisLine={{
+                    stroke: "#E7DED2",
+                  }}
                   tickLine={false}
                   angle={
                     metricKeys.length > 1
@@ -258,16 +309,20 @@ function MultiMetricBarChart({
 
                 <YAxis
                   tick={{
-                    fill: "#94a3b8",
+                    fill: "#756F67",
                     fontSize: 11,
                   }}
-                  axisLine={false}
+                  axisLine={{
+                    stroke: "#E7DED2",
+                  }}
                   tickLine={false}
                   tickFormatter={(value) =>
                     formatNumber(value)
                   }
                 />
+
               </>
+
             )}
 
             <Tooltip
@@ -275,13 +330,13 @@ function MultiMetricBarChart({
                 <MultiMetricTooltip />
               }
               cursor={{
-                fill: "rgba(255,255,255,0.04)",
+                fill: "rgba(198,93,50,0.06)",
               }}
             />
 
             <Legend
               wrapperStyle={{
-                color: "#94a3b8",
+                color: "#756F67",
                 fontSize: "12px",
                 paddingTop: "12px",
               }}
@@ -292,6 +347,7 @@ function MultiMetricBarChart({
 
             {metricKeys.map(
               (metricKey, index) => (
+
                 <Bar
                   key={metricKey}
                   dataKey={metricKey}
@@ -299,28 +355,27 @@ function MultiMetricBarChart({
                     metricKey
                   )}
                   fill={
-                    index === 0
-                      ? "#8b5cf6"
-                      : index === 1
-                      ? "#22d3ee"
-                      : index === 2
-                      ? "#34d399"
-                      : index === 3
-                      ? "#f59e0b"
-                      : "#f472b6"
+                    chartColors[
+                      index % chartColors.length
+                    ]
                   }
                   radius={
                     horizontal
-                      ? [0, 4, 4, 0]
-                      : [4, 4, 0, 0]
+                      ? [0, 6, 6, 0]
+                      : [6, 6, 0, 0]
                   }
                   maxBarSize={45}
                 />
+
               )
             )}
+
           </RechartsBarChart>
+
         </ResponsiveContainer>
+
       </div>
+
     </div>
   );
 }
@@ -340,24 +395,47 @@ function MultiMetricLineChart({
   metricKeys: string[];
   title: string;
 }) {
+
+  const chartColors = [
+    "#C65D32",
+    "#D99A5B",
+    "#3F7D58",
+    "#8C6A4A",
+    "#B94A48",
+  ];
+
   return (
-    <div className="w-full rounded-xl border border-white/10 bg-[#070c1d] p-4">
+    <div
+      className="
+        w-full
+        rounded-2xl
+        border
+        border-[#E7DED2]
+        bg-[#FFFDF8]
+        p-4
+        sm:p-5
+      "
+    >
 
       <div className="mb-4">
-        <h4 className="text-sm font-semibold text-white">
+
+        <h4 className="text-base font-semibold text-[#25221F]">
           {title}
         </h4>
 
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-[#756F67]">
           Trend comparison across multiple business metrics.
         </p>
+
       </div>
 
-      <div className="h-[380px] w-full">
+      <div className="h-[300px] w-full sm:h-[340px] lg:h-[380px]">
+
         <ResponsiveContainer
           width="100%"
           height="100%"
         >
+
           <RechartsLineChart
             data={data}
             margin={{
@@ -367,27 +445,32 @@ function MultiMetricLineChart({
               bottom: 30,
             }}
           >
+
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.08)"
+              stroke="#E7DED2"
             />
 
             <XAxis
               dataKey={xKey}
               tick={{
-                fill: "#94a3b8",
+                fill: "#756F67",
                 fontSize: 11,
               }}
-              axisLine={false}
+              axisLine={{
+                stroke: "#E7DED2",
+              }}
               tickLine={false}
             />
 
             <YAxis
               tick={{
-                fill: "#94a3b8",
+                fill: "#756F67",
                 fontSize: 11,
               }}
-              axisLine={false}
+              axisLine={{
+                stroke: "#E7DED2",
+              }}
               tickLine={false}
               tickFormatter={(value) =>
                 formatNumber(value)
@@ -398,11 +481,14 @@ function MultiMetricLineChart({
               content={
                 <MultiMetricTooltip />
               }
+              cursor={{
+                stroke: "#E7DED2",
+              }}
             />
 
             <Legend
               wrapperStyle={{
-                color: "#94a3b8",
+                color: "#756F67",
                 fontSize: "12px",
                 paddingTop: "12px",
               }}
@@ -413,6 +499,7 @@ function MultiMetricLineChart({
 
             {metricKeys.map(
               (metricKey, index) => (
+
                 <Line
                   key={metricKey}
                   type="monotone"
@@ -421,29 +508,30 @@ function MultiMetricLineChart({
                     metricKey
                   )}
                   stroke={
-                    index === 0
-                      ? "#8b5cf6"
-                      : index === 1
-                      ? "#22d3ee"
-                      : index === 2
-                      ? "#34d399"
-                      : index === 3
-                      ? "#f59e0b"
-                      : "#f472b6"
+                    chartColors[
+                      index % chartColors.length
+                    ]
                   }
-                  strokeWidth={2}
+                  strokeWidth={3}
                   dot={{
                     r: 3,
+                    fill: "#FFFDF8",
+                    strokeWidth: 2,
                   }}
                   activeDot={{
                     r: 5,
                   }}
                 />
+
               )
             )}
+
           </RechartsLineChart>
+
         </ResponsiveContainer>
+
       </div>
+
     </div>
   );
 }
@@ -485,7 +573,6 @@ export default function VisualizationEngine({
   const normalizedRows = data.map(
     (row: any) => {
 
-      // Backend already returned an object
       if (
         row &&
         !Array.isArray(row)
@@ -493,7 +580,6 @@ export default function VisualizationEngine({
         return row;
       }
 
-      // Backend returned array format
       const converted: Record<
         string,
         any
@@ -533,7 +619,10 @@ export default function VisualizationEngine({
     }
   );
 
-  // Safety fallback
+  // ==========================================================
+  // SAFETY FALLBACK
+  // ==========================================================
+
   if (!metricKeys.length) {
     return null;
   }
@@ -546,15 +635,6 @@ export default function VisualizationEngine({
   // ==========================================================
   // SINGLE METRIC NAME
   // ==========================================================
-  //
-  // IMPORTANT:
-  //
-  // TOTAL_SALES    -> Sales
-  // TOTAL_PROFIT   -> Profit
-  // TOTAL_QUANTITY -> Quantity
-  //
-  // This is the main fix for the current issue.
-  // ==========================================================
 
   const singleMetricName =
     getSingleMetricName(yKey);
@@ -566,10 +646,6 @@ export default function VisualizationEngine({
   const normalizedQuestion =
     question.toLowerCase();
 
-  // ----------------------------------------------------------
-  // Top / Highest questions
-  // ----------------------------------------------------------
-
   const isTopQuestion =
     normalizedQuestion.includes(
       "top"
@@ -580,10 +656,6 @@ export default function VisualizationEngine({
     normalizedQuestion.includes(
       "best"
     );
-
-  // ----------------------------------------------------------
-  // Bottom / Lowest questions
-  // ----------------------------------------------------------
 
   const isBottomQuestion =
     normalizedQuestion.includes(
@@ -634,9 +706,9 @@ export default function VisualizationEngine({
   const isMarket =
     groupName.includes("market");
 
-  // ----------------------------------------------------------
-  // Pie / Donut eligible dimensions
-  // ----------------------------------------------------------
+  // ==========================================================
+  // PIE / DONUT ELIGIBLE DIMENSIONS
+  // ==========================================================
 
   const isPieDimension =
     isCategory ||
@@ -657,10 +729,6 @@ export default function VisualizationEngine({
 
   const isDate =
     groupName.includes("date");
-
-  // ----------------------------------------------------------
-  // Overall time-series flag
-  // ----------------------------------------------------------
 
   const isTimeSeries =
     isYear ||
@@ -685,10 +753,12 @@ export default function VisualizationEngine({
 
         metricKeys.forEach(
           (metricKey) => {
+
             converted[metricKey] =
               Number(
                 row[metricKey]
               ) || 0;
+
           }
         );
 
@@ -699,27 +769,20 @@ export default function VisualizationEngine({
   // ==========================================================
   // SORTING
   // ==========================================================
-  //
-  // Time series:
-  //     Preserve backend chronological order.
-  //
-  // Normal categorical data:
-  //     Sort highest → lowest using
-  //     the first metric.
-  //
-  // ==========================================================
 
   let sortedChartData = [
     ...chartData,
   ];
 
   if (!isTimeSeries) {
+
     sortedChartData =
       sortedChartData.sort(
         (a, b) =>
           Number(b[yKey]) -
           Number(a[yKey])
       );
+
   }
 
   // ==========================================================
@@ -790,6 +853,7 @@ export default function VisualizationEngine({
     title = metricKeys
       .map(formatMetricName)
       .join(" & ");
+
   }
 
   // ----------------------------------------------------------
@@ -1092,6 +1156,10 @@ export default function VisualizationEngine({
 
       {/* ======================================================
           VISUALIZATION HEADER
+
+          NOTE:
+          The old "Visualization" label was removed here.
+          The chart component itself already displays its title.
       ====================================================== */}
 
       <div>
@@ -1099,32 +1167,22 @@ export default function VisualizationEngine({
         <div
           className="
             flex
-            items-center
-            justify-between
-            gap-4
+            flex-col
+            items-start
+            gap-3
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
           "
         >
 
           <div>
 
-            <p
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[0.18em]
-                text-violet-400
-              "
-            >
-              Visualization
-            </p>
-
             <h3
               className="
-                mt-1
                 text-lg
                 font-semibold
-                text-white
+                text-[#25221F]
               "
             >
               {title}
@@ -1140,12 +1198,13 @@ export default function VisualizationEngine({
             className="
               rounded-full
               border
-              border-white/10
-              bg-white/[0.03]
+              border-[#E7DED2]
+              bg-[#F7F3EA]
               px-3
               py-1
               text-xs
-              text-slate-400
+              font-medium
+              text-[#756F67]
             "
           >
             {chartTypeLabel}
@@ -1156,8 +1215,12 @@ export default function VisualizationEngine({
         <p
           className="
             mt-2
-            text-sm
-            text-slate-500
+            max-w-3xl
+            text-xs
+            leading-5
+            text-[#756F67]
+            sm:text-sm
+            sm:leading-6
           "
         >
           {description}
@@ -1172,10 +1235,6 @@ export default function VisualizationEngine({
       {hasMultipleMetrics &&
       isTimeSeries ? (
 
-        // ====================================================
-        // MULTI-METRIC TIME SERIES
-        // ====================================================
-
         <MultiMetricLineChart
           data={sortedChartData}
           xKey={xKey}
@@ -1184,10 +1243,6 @@ export default function VisualizationEngine({
         />
 
       ) : hasMultipleMetrics ? (
-
-        // ====================================================
-        // MULTI-METRIC CATEGORICAL COMPARISON
-        // ====================================================
 
         <MultiMetricBarChart
           data={visibleChartData}
@@ -1201,10 +1256,6 @@ export default function VisualizationEngine({
 
       ) : isTimeSeries ? (
 
-        // ====================================================
-        // SINGLE METRIC → LINE CHART
-        // ====================================================
-
         <BusinessLineChart
           data={sortedChartData}
           xKey={xKey}
@@ -1213,10 +1264,6 @@ export default function VisualizationEngine({
         />
 
       ) : shouldUsePieChart ? (
-
-        // ====================================================
-        // SINGLE METRIC → PIE / DONUT CHART
-        // ====================================================
 
         <BusinessPieChart
           data={sortedChartData}
@@ -1228,10 +1275,6 @@ export default function VisualizationEngine({
 
       ) : shouldUseHorizontalChart ? (
 
-        // ====================================================
-        // MANY CATEGORIES / RANKING
-        // ====================================================
-
         <HorizontalBarChart
           data={visibleChartData}
           xKey={xKey}
@@ -1240,10 +1283,6 @@ export default function VisualizationEngine({
         />
 
       ) : (
-
-        // ====================================================
-        // NORMAL CATEGORICAL COMPARISON
-        // ====================================================
 
         <BusinessBarChart
           data={visibleChartData}
@@ -1264,7 +1303,8 @@ export default function VisualizationEngine({
             className="
               text-center
               text-xs
-              text-slate-500
+              leading-5
+              text-[#756F67]
             "
           >
             Showing the top 15 results in
